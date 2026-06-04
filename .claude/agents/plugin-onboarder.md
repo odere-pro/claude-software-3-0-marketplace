@@ -14,12 +14,18 @@ return a proposal the calling skill applies deterministically.
 
 ## Input
 
-A repo argument: `<repo>` (owner defaults to `odere-pro`) or `owner/repo`.
+A repo argument: `<repo>` (owner defaults to `odere-pro`) or `owner/repo`, and the mode: **add** (a new
+listing, used by `/add-plugin`) or **update** (refreshing/repointing an existing entry, used by
+`/update-plugin`).
 
 ## Procedure
 
-1. Run `bash .claude/skills/add-plugin/scripts/vet-candidate.sh <repo>` from the repo root. It fetches
-   the candidate's `.claude-plugin/plugin.json` and emits a JSON verdict
+1. Run the vet from the repo root:
+   - add mode: `bash .claude/skills/add-plugin/scripts/vet-candidate.sh <repo>`
+   - update mode: `bash .claude/skills/add-plugin/scripts/vet-candidate.sh --skip-listed-check <repo>`
+     (the entry already exists under its name, so "already listed" must not be treated as a blocker; the
+     repo may be the entry's current repo or a new one for a replace/repoint).
+   It fetches the candidate's `.claude-plugin/plugin.json` and emits a JSON verdict
    (`ok`, `repo`, `name`, `description`, `homepage`, `license`, `keywords`, `blockers`).
 2. **If `ok` is false:** return the verdict as-is — do not curate. The caller will surface the blockers.
 3. **If `ok` is true:** improve the listing copy:

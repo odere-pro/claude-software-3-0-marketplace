@@ -1,21 +1,32 @@
 #!/usr/bin/env bash
 # vet-candidate.sh — read-only preflight for a candidate plugin repo. (no writes)
 #
-# Usage: vet-candidate.sh <repo|owner/repo>
+# Usage: vet-candidate.sh [--skip-listed-check] <repo|owner/repo>
 # Fetches the candidate's .claude-plugin/plugin.json over `gh api`, checks the marketplace contract,
 # and prints a JSON verdict on stdout:
 #   { "ok": bool, "repo": "owner/repo", "blockers": [..], "name": "..", "description": "..",
 #     "homepage": "..", "license": "..", "keywords": [..] }
-# Exit 0 if ok, 1 if there are blockers, 2 on usage/tooling error. Human notes go to stderr.
+# --skip-listed-check: don't flag "already listed" (used by /update-plugin, which expects the entry to
+# exist). Exit 0 if ok, 1 if there are blockers, 2 on usage/tooling error. Human notes go to stderr.
 set -euo pipefail
 # shellcheck source=lib.sh
 . "$(dirname -- "$0")/lib.sh"
 
-[ "$#" -ge 1 ] || { echo "usage: vet-candidate.sh <repo|owner/repo>" >&2; exit 2; }
+skip_listed=false
+repo_arg=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --skip-listed-check) skip_listed=true; shift ;;
+    -*) echo "unknown option: $1" >&2; exit 2 ;;
+    *) repo_arg="$1"; shift ;;
+  esac
+done
+
+[ -n "$repo_arg" ] || { echo "usage: vet-candidate.sh [--skip-listed-check] <repo|owner/repo>" >&2; exit 2; }
 command -v gh >/dev/null 2>&1 || { echo "gh (GitHub CLI) is required" >&2; exit 2; }
 command -v jq >/dev/null 2>&1 || { echo "jq is required" >&2; exit 2; }
 
-REPO="$(mk_normalize_repo "$1")"
+REPO="$(mk_normalize_repo "$repo_arg")"
 owner="${REPO%%/*}"
 name_from_repo="${REPO##*/}"
 
@@ -63,9 +74,9 @@ if [ -n "$pj" ]; then
   [ -n "$c_lic" ]  || blockers+=("$REPO plugin.json has no \"license\"")
 fi
 
-# Already listed here?
+# Already listed here? (skipped for /update-plugin, which operates on an existing entry.)
 root="$(mk_repo_root)"
-if [ -f "$root/$MK_MANIFEST" ]; then
+if ! $skip_listed && [ -f "$root/$MK_MANIFEST" ]; then
   if jq -e --arg n "$entry_name" '.plugins[]? | select(.name == $n)' "$root/$MK_MANIFEST" >/dev/null 2>&1; then
     blockers+=("\"$entry_name\" is already listed in the marketplace")
   fi

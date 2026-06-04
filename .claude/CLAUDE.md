@@ -19,10 +19,14 @@ high-signal harness for a repo whose only payload is one JSON file.
     or an AI attribution trailer.
   - `json-format.sh` (PostToolUse `Write|Edit`) — pretty-prints edited valid `*.json`; no-op otherwise.
   - All read the hook payload from stdin (JSON) via `python3`; exit `2` blocks, `0` allows.
-- **`skills/`** — the agent-driven "add a plugin" workflow:
+- **`skills/`** — the agent-driven manage-plugins workflow:
   - `add-plugin/` — `/add-plugin <repo>`: vet → edit manifest + README + CHANGELOG → gates → PR. Its
-    deterministic core is `scripts/{vet-candidate,add-entry,sync-readme,lib}.sh`.
+    deterministic core lives in `scripts/`:
+    `{vet-candidate,add-entry,update-entry,remove-entry,sync-readme,lib}.sh` (shared by all four skills).
   - `vet-plugin/` — `/vet-plugin <repo>`: read-only preflight (go/no-go + blockers).
+  - `update-plugin/` — `/update-plugin <name> [--repo …] [--name …]`: refresh / repoint / rename an
+    existing entry.
+  - `remove-plugin/` — `/remove-plugin <name>`: drop an entry.
   See [`docs/adding-plugins.md`](../docs/adding-plugins.md).
 - **`agents/plugin-onboarder.md`** — read-only worker the skills delegate to: fetches + vets a candidate
   repo and curates its description/keywords; never edits the manifest.

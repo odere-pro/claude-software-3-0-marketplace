@@ -9,8 +9,10 @@ CI, and an author-only `.claude/` harness.
 The easy, accurate path is the agent-driven workflow — in a Claude Code session in this repo:
 
 ```text
-/vet-plugin <repo>     # read-only preflight: ready? what's blocking?
-/add-plugin <repo>     # vet → edit manifest + README + CHANGELOG → run gates → open a PR
+/vet-plugin <repo>             # read-only preflight: ready? what's blocking?
+/add-plugin <repo>             # add: vet → edit manifest + README + CHANGELOG → gates → PR
+/update-plugin <name>          # refresh metadata; --repo to repoint, --name to rename
+/remove-plugin <name>          # drop an entry
 ```
 
 It vets the candidate, inserts a well-formed entry, regenerates the README table, updates the

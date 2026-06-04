@@ -9,6 +9,8 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
 
 ### Added
 
+- `/update-plugin` (refresh / `--repo` repoint / `--name` rename) and `/remove-plugin` skills, with
+  `update-entry.sh` / `remove-entry.sh` and a `--skip-listed-check` mode on `vet-candidate.sh`.
 - Agent-driven "add a plugin" workflow: `/add-plugin` + `/vet-plugin` skills, a `plugin-onboarder`
   worker agent, deterministic `vet-candidate` / `add-entry` / `sync-readme` scripts, a
   `09-readme-in-sync` gate (README table generated from the manifest), and `docs/adding-plugins.md`.

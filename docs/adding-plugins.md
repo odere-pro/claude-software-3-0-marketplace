@@ -1,18 +1,23 @@
-# Adding a plugin to the odere-pro marketplace
+# Managing odere-pro marketplace plugins
 
-This is the canonical, agent-driven process for listing a plugin in the `odere-pro` registry. It is
-**author-only** tooling — it edits this repo's `marketplace.json`, README, and CHANGELOG, and opens a
-PR. It never edits the candidate's own repository.
+This is the canonical, agent-driven process for **adding, updating, and removing** plugins in the
+`odere-pro` registry. It is **author-only** tooling — it edits this repo's `marketplace.json`, README,
+and CHANGELOG, and opens a PR. It never edits a plugin's own repository.
 
 ## TL;DR
 
 ```text
-/vet-plugin claude-aws-architect      # read-only: is it ready? what's blocking?
-/add-plugin claude-aws-architect      # vet → edit manifest + README + CHANGELOG → gates → PR
+/vet-plugin   claude-aws-architect           # read-only: is it ready? what's blocking?
+/add-plugin   claude-aws-architect           # add: vet → manifest + README + CHANGELOG → gates → PR
+/update-plugin claude-aws-architect          # refresh metadata from the plugin's plugin.json
+/update-plugin claude-aws-architect --repo odere-pro/new-repo   # replace / repoint
+/update-plugin claude-aws-architect --name aws-architect        # rename the entry
+/remove-plugin claude-aws-architect          # drop the entry
 ```
 
 `<repo>` defaults the owner to `odere-pro`; pass `owner/repo` to be explicit (owner must be
-`odere-pro`). Add `--name <name>` to override the entry name.
+`odere-pro`). `/add-plugin` and `/update-plugin` accept `--name <name>` to set/override the entry name;
+`/remove-plugin` and `/update-plugin` take the entry **name** as it appears in the registry.
 
 ## The contract (what makes a candidate listable)
 
@@ -36,12 +41,14 @@ default branch). The entry `name` may differ from the repo basename — e.g. `pl
 
 | Piece | Role |
 | ----- | ---- |
-| `/add-plugin`, `/vet-plugin` | the skills you invoke (`.claude/skills/`) |
+| `/add-plugin`, `/vet-plugin`, `/update-plugin`, `/remove-plugin` | the skills you invoke (`.claude/skills/`) |
 | `plugin-onboarder` | worker agent: fetches + vets the repo, curates description/keywords (`.claude/agents/`) |
-| `vet-candidate.sh` | read-only preflight → JSON verdict (`ok` + `blockers[]` + entry fields) |
+| `vet-candidate.sh` | read-only preflight → JSON verdict (`ok` + `blockers[]` + entry fields); `--skip-listed-check` for updates |
 | `add-entry.sh` | re-vets, then inserts the entry with `jq` (idempotent, no duplicates) |
+| `update-entry.sh` | re-vets, then replaces an existing entry in place (refresh / repoint / rename) |
+| `remove-entry.sh` | deletes an entry by name with `jq` |
 | `sync-readme.sh` | regenerates the README Plugins table from the manifest |
-| gate `02-marketplace-shape` | CI enforcement of the contract above |
+| gate `02-marketplace-shape` | CI enforcement of the contract above (allows an empty registry) |
 | gate `09-readme-in-sync` | README table can't drift from the manifest |
 
 ## Clearing the common blockers
@@ -52,6 +59,26 @@ default branch). The entry `name` may differ from the repo basename — e.g. `pl
   PR. Then re-run `/add-plugin`.
 - **"owner is …; lists odere-pro repos only"** — only `odere-pro`-owned repos can be listed.
 - **"already listed"** — it's already in the marketplace; nothing to do.
+
+## Updating or replacing a plugin
+
+`/update-plugin <name>` operates on an **already-listed** entry and re-vets the target repo with
+`--skip-listed-check` (so "already listed" isn't a blocker), then replaces the entry in place:
+
+- **Refresh** — `/update-plugin <name>` re-pulls `description` / `keywords` / `homepage` / `license`
+  from the plugin's current `plugin.json` (use after the plugin changes its manifest).
+- **Replace / repoint** — `/update-plugin <name> --repo odere-pro/<new-repo>` points the same entry at a
+  different odere-pro repo (the new repo is vetted like any candidate).
+- **Rename** — `/update-plugin <name> --name <new-name>` renames the entry (refuses a name that collides
+  with another entry).
+
+It only ever changes an existing entry; to add a brand-new one use `/add-plugin`.
+
+## Removing a plugin
+
+`/remove-plugin <name>` deletes the entry by name, regenerates the README (showing the placeholder if it
+was the last plugin), updates CHANGELOG, runs the gates, and opens a PR. Removing the last entry leaves
+`plugins: []`, which is allowed.
 
 ## Empty registry
 

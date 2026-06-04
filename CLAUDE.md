@@ -34,12 +34,13 @@ This repo has **no `plugin.json` and no plugin components** (`skills/`, `agents/
 Every navigational layer carries a `CLAUDE.md` that says *just enough* for its level; detail deepens
 as you descend. `tests/gates/07-claude-md-coverage.sh` enforces presence for the documented layers.
 
-## How to add a plugin
+## How to manage plugins
 
-Use the agent-driven workflow: `/vet-plugin <repo>` to preflight, then `/add-plugin <repo>` to vet →
-edit manifest + README + CHANGELOG → run gates → open a PR. Full process, contract, and manual
-fallback: [`docs/adding-plugins.md`](docs/adding-plugins.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), and
-[`.claude-plugin/CLAUDE.md`](.claude-plugin/CLAUDE.md).
+Use the agent-driven skills (each vets, edits the manifest + README + CHANGELOG, runs gates, and opens a
+PR): `/vet-plugin <repo>` (read-only preflight), `/add-plugin <repo>`, `/update-plugin <name>`
+(refresh / `--repo` repoint / `--name` rename), `/remove-plugin <name>`. Full process, contract, and
+manual fallback: [`docs/adding-plugins.md`](docs/adding-plugins.md),
+[`CONTRIBUTING.md`](CONTRIBUTING.md), and [`.claude-plugin/CLAUDE.md`](.claude-plugin/CLAUDE.md).
 
 ## Gate map
 
