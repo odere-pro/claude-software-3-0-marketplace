@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "odere-pro",
+  "owner": {
+    "name": "odere-pro",
+    "email": "odere.pro@gmail.com"
+  },
+  "description": "odere-pro's Claude Code plugins — a single marketplace that aggregates each plugin from its own repository, so every plugin installs individually as <plugin>@odere-pro.",
+  "plugins": [
+    {
+      "name": "claude-oop-excellence",
+      "source": {
+        "source": "github",
+        "repo": "odere-pro/claude-oop-excellence"
+      },
+      "description": "Language-agnostic OOP design enforcement. A single read-only /audit front door runs two tracks in parallel — RISK (issues) and PATTERN (existing-pattern scan + pattern-fit suggestions) — into one unified report; every track / aspect / family / entity is individually selectable. Driven by a canonical glossary of 102 entities (45 issues + 57 design patterns), with glossary-driven workers fanning out per family in parallel and an audit → action handoff to gated, test-verified fix and implement commands.",
+      "homepage": "https://github.com/odere-pro/claude-oop-excellence",
+      "license": "MIT",
+      "keywords": [
+        "oop",
+        "design-patterns",
+        "antipatterns",
+        "code-quality",
+        "refactoring"
+      ]
+    },
+    {
+      "name": "claude-calibration",
+      "source": {
+        "source": "github",
+        "repo": "odere-pro/claude-calibration"
+      },
+      "description": "Audit and harden a Claude Code setup: an evaluate → plan → calibrate → re-evaluate loop over CLAUDE.md, rules, settings, skills, subagents, hooks, MCP, and plugins, where recurring findings are promoted into enforcement (hooks/rules/wrapper skills).",
+      "homepage": "https://github.com/odere-pro/claude-calibration",
+      "license": "MIT",
+      "keywords": [
+        "calibration",
+        "evaluation",
+        "config-audit"
+      ]
+    }
+  ]
+}
