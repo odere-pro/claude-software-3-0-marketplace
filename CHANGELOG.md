@@ -9,8 +9,16 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
 
 ### Added
 
+- `/update-plugin` (refresh / `--repo` repoint / `--name` rename) and `/remove-plugin` skills, with
+  `update-entry.sh` / `remove-entry.sh` and a `--skip-listed-check` mode on `vet-candidate.sh`.
+- Agent-driven "add a plugin" workflow: `/add-plugin` + `/vet-plugin` skills, a `plugin-onboarder`
+  worker agent, deterministic `vet-candidate` / `add-entry` / `sync-readme` scripts, a
+  `09-readme-in-sync` gate (README table generated from the manifest), and `docs/adding-plugins.md`.
+- Relaxed `02-marketplace-shape` to allow an entry `name` to differ from the repo basename (owner still
+  pinned to `odere-pro`) and to require unique entry names; `marketplace-guard` mirrors the owner rule.
+
 - GitHub best practices and a top-level `.claude/` harness: governance docs (`SECURITY.md`,
   `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODEOWNERS`), CI + supply-chain workflows
   (`ci.yml`, dormant `scorecard.yml` / `codeql.yml`, Dependabot, SHA-pinned actions), repo hygiene
   configs, a `tests/gates/` validation suite, a `SOFTWARE-3-0.md`, and nested `CLAUDE.md` navigation.
-- Initial registry: `claude-oop-excellence` and `claude-calibration`, each as a `github` source.
+- The registry starts **empty** — plugins are added one at a time (after testing) via `/add-plugin`.

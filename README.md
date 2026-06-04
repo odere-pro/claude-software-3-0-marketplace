@@ -11,6 +11,9 @@ aggregated here, so you add this marketplace once and install any plugin individ
 The marketplace `name` is **`odere-pro`** — installs are always `<plugin>@odere-pro`, regardless of
 this repo's name.
 
+> **Status:** the registry is starting **empty** — plugins are added one at a time (after testing) via
+> the [`/add-plugin`](#managing-plugins) workflow. The list below is the source of truth.
+
 ## Add the marketplace
 
 ```text
@@ -19,17 +22,19 @@ this repo's name.
 
 ## Install plugins
 
+No plugins are listed yet (see the table below). Once a plugin is listed, install it with:
+
 ```text
-/plugin install claude-oop-excellence@odere-pro
-/plugin install claude-calibration@odere-pro
+/plugin install <plugin>@odere-pro
 ```
 
 ## Plugins
 
-| Plugin | Repo | What it does |
-| --- | --- | --- |
-| `claude-oop-excellence` | [odere-pro/claude-oop-excellence](https://github.com/odere-pro/claude-oop-excellence) | Language-agnostic OOP design enforcement: a read-only `/audit` front door runs RISK + PATTERN tracks in parallel into one unified report, with an audit → action handoff to gated, test-verified fixes. |
-| `claude-calibration` | [odere-pro/claude-calibration](https://github.com/odere-pro/claude-calibration) | Audit and harden a Claude Code setup via an evaluate → plan → calibrate → re-evaluate loop, promoting recurring findings into enforcement (hooks/rules/wrapper skills). |
+<!-- The table below is generated from .claude-plugin/marketplace.json by
+     .claude/skills/add-plugin/scripts/sync-readme.sh. Don't edit it by hand. -->
+<!-- BEGIN PLUGINS -->
+_No plugins listed yet — add one with `/add-plugin <repo>` (see [docs/adding-plugins.md](docs/adding-plugins.md))._
+<!-- END PLUGINS -->
 
 ## How it's wired
 
@@ -47,11 +52,26 @@ of its own. Each entry references its plugin's repository with a `github`
 Entries omit `version` — each plugin's own `.claude-plugin/plugin.json` is the version of record — and
 omit `sha`/`commit`, so installs track each plugin repo's default branch.
 
-### Adding a plugin
+### Managing plugins
 
-Append one block to the `plugins` array in `.claude-plugin/marketplace.json`, sync this table and
-`CHANGELOG.md`, and run the gates. Full steps and the manifest contract are in
-[`CONTRIBUTING.md`](CONTRIBUTING.md):
+The easy path is the agent-driven workflow — in a Claude Code session in this repo:
+
+```text
+/vet-plugin <repo>                          # read-only: is the candidate ready? what's blocking?
+/add-plugin <repo>                          # vet → edit manifest + README + CHANGELOG → run gates → open a PR
+/update-plugin <name>                       # refresh description/keywords/homepage/license from the plugin's plugin.json
+/update-plugin <name> --repo odere-pro/<new-repo>   # replace / repoint the entry at a different repo
+/update-plugin <name> --name <new-name>     # rename the entry
+/remove-plugin <name>                       # drop the entry
+```
+
+`/add-plugin` and `/vet-plugin` take a **repo** (`odere-pro/<repo>`); `/update-plugin` and
+`/remove-plugin` take the entry **name** as it appears in the registry. Each command edits the
+manifest, regenerates the table above, updates `CHANGELOG`, runs the gates, and opens a PR; the add /
+update paths also vet the target repo (odere-pro owner, valid `plugin.json`, ships no
+`marketplace.json` of its own). Full process, contract, and the manual fallback are in
+[`docs/adding-plugins.md`](docs/adding-plugins.md) and [`CONTRIBUTING.md`](CONTRIBUTING.md). A manifest
+entry looks like:
 
 ```json
 {
@@ -62,6 +82,9 @@ Append one block to the `plugins` array in `.claude-plugin/marketplace.json`, sy
   "license": "MIT"
 }
 ```
+
+Entries omit `version` (the plugin's own `plugin.json` is the version of record) and `sha`/`commit`.
+The entry name may differ from the repo basename.
 
 ## Developing this registry
 

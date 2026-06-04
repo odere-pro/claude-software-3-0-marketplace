@@ -49,15 +49,16 @@ flowchart LR
   add --> list --> resolve --> install --> load
 ```
 
-No step needs a human: the coordinate is derivable (`repo == odere-pro/<name>`), the index is JSON, and
-the failure modes are gated, not folklore.
+No step needs a human: the coordinate is derivable from the entry `name`, the index is JSON, and the
+failure modes are gated, not folklore. The `/add-plugin` skill drives the reverse direction — extend the
+index — under the same contract.
 
 ## The pillars
 
 **1 · One machine-readable contract at the boundary.** The entire product surface is
 `.claude-plugin/marketplace.json`: top-level `name: "odere-pro"`, and a `plugins[]` array where each
-entry is a `github` source (`repo: odere-pro/<name>`) carrying `description`, `homepage`, `license`,
-`keywords`. An agent reads it without parsing prose. The schema is pinned via `$schema`.
+entry is an `odere-pro` `github` source carrying `description`, `homepage`, `license`, `keywords`. An
+agent reads it without parsing prose. The schema is pinned via `$schema`.
 
 **2 · A stable, computable install coordinate.** Installs are always `<plugin>@odere-pro`, regardless of
 this repo's name. The marketplace `name` — not the repo — is the coordinate, so an agent can construct
@@ -83,7 +84,8 @@ something the docs don't say, that's a bug — the product is the docs plus the 
 | Gate | Property it guarantees |
 | ---- | ---------------------- |
 | `01-json-parses` | the index is machine-readable at all |
-| `02-marketplace-shape` | the contract above (name, `github` sources, `repo == odere-pro/<name>`, no `version`/`sha`) |
+| `02-marketplace-shape` | the contract above (name, `odere-pro` `github` sources, unique entry names, no `version`/`sha`) |
+| `09-readme-in-sync` | the README plugins table is generated from the manifest — docs can't drift |
 | `03-no-absolute-paths` / `04-secret-scan` | nothing leaks a machine path or a credential |
 | `05-doc-links` | the man pages don't dangle |
 | `06-shellcheck` | the harness hooks are sound |
@@ -96,15 +98,18 @@ edit lands — local feedback that mirrors CI.
 
 > "Add my new plugin `claude-wiki-pages` to the marketplace."
 
-An agent: opens `.claude-plugin/marketplace.json`; appends one block with
-`source: { source: "github", repo: "odere-pro/claude-wiki-pages" }`, a description, homepage, license,
-keywords — no `version`. The PostToolUse hook reindents it; the PreToolUse guard confirms it's valid and
-clean. The agent syncs the README table and a `CHANGELOG.md` bullet, then runs `bash
-tests/gates/run-all.sh` → green. It opens a PR; `ci.yml` re-runs the gates. After merge, anyone runs
-`/plugin install claude-wiki-pages@odere-pro`. No human guessed a coordinate or eyeballed JSON.
+An agent runs `/add-plugin claude-wiki-pages`. The `plugin-onboarder` agent vets the repo via
+`vet-candidate.sh` (owner `odere-pro`, valid `plugin.json`, ships no `marketplace.json` of its own, not
+already listed) and curates the description/keywords. If a blocker is found — e.g. the candidate still
+ships its own `marketplace.json` — it **stops with the fix** and writes nothing. Otherwise
+`add-entry.sh` inserts the entry (`jq`, no `version`), `sync-readme.sh` regenerates the README table, a
+`CHANGELOG.md` bullet is added, `bash tests/gates/run-all.sh` goes green, and it opens a PR; `ci.yml`
+re-runs the gates. After merge, anyone runs `/plugin install claude-wiki-pages@odere-pro`. No human
+guessed a coordinate or eyeballed JSON.
 
 ## Where to read next
 
+- Adding a plugin (the agent-driven workflow) — [`docs/adding-plugins.md`](docs/adding-plugins.md)
 - The manifest contract, in depth — [`.claude-plugin/CLAUDE.md`](.claude-plugin/CLAUDE.md)
 - The gate suite — [`tests/gates/CLAUDE.md`](tests/gates/CLAUDE.md)
 - CI and supply chain — [`.github/CLAUDE.md`](.github/CLAUDE.md)
