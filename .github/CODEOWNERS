@@ -1,0 +1,3 @@
+# Default owner for everything in the repo. Enables code-owner review on branch-protected
+# pull requests (also an OpenSSF Scorecard "Code-Review" signal).
+* @odere-pro

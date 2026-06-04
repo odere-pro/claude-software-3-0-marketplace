@@ -1,0 +1,41 @@
+name: codeql
+
+# Static analysis (SAST) via CodeQL. This repo is Markdown + Bash + JSON with no compiled language,
+# so we analyze the `actions` language — CodeQL inspects the GitHub Actions workflows themselves for
+# security issues. Results upload to code-scanning and feed the OpenSSF Scorecard SAST check.
+#
+# DORMANT until this repo is PUBLIC: code-scanning upload requires a public repo (or GitHub Advanced
+# Security). Until then only the manual `workflow_dispatch` trigger is active. When the repo goes
+# public, uncomment the `push` / `pull_request` / `schedule` triggers below.
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: ["main"]
+  # pull_request:
+  #   branches: ["main"]
+  # schedule:
+  #   - cron: "27 4 * * 1" # weekly, Monday 04:27 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: analyze (actions)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # upload results to code-scanning
+      actions: read
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4.36.1
+        with:
+          languages: actions
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@87557b9c84dde89fdd9b10e88954ac2f4248e463 # v4.36.1

@@ -1,5 +1,9 @@
 # odere-pro Claude Code marketplace
 
+[![CI](https://github.com/odere-pro/claude-software-3-0-marketplace/actions/workflows/ci.yml/badge.svg)](https://github.com/odere-pro/claude-software-3-0-marketplace/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Claude Code marketplace](https://img.shields.io/badge/Claude%20Code-marketplace-8A2BE2)](https://docs.claude.com/en/docs/claude-code/plugins)
+
 The single [Claude Code](https://docs.claude.com/en/docs/claude-code) plugin marketplace for
 [`odere-pro`](https://github.com/odere-pro). Each plugin lives in its **own** repository and is
 aggregated here, so you add this marketplace once and install any plugin individually.
@@ -45,7 +49,9 @@ omit `sha`/`commit`, so installs track each plugin repo's default branch.
 
 ### Adding a plugin
 
-Append one block to the `plugins` array in `.claude-plugin/marketplace.json` and push:
+Append one block to the `plugins` array in `.claude-plugin/marketplace.json`, sync this table and
+`CHANGELOG.md`, and run the gates. Full steps and the manifest contract are in
+[`CONTRIBUTING.md`](CONTRIBUTING.md):
 
 ```json
 {
@@ -56,6 +62,14 @@ Append one block to the `plugins` array in `.claude-plugin/marketplace.json` and
   "license": "MIT"
 }
 ```
+
+## Developing this registry
+
+This repo carries a full GitHub + Claude Code harness: validation gates (`tests/gates/`), CI and
+supply-chain workflows (`.github/`), and an author-only `.claude/` harness. Why a registry is built
+this way — as an agent-operable index — is in [`SOFTWARE-3-0.md`](SOFTWARE-3-0.md). Governance:
+[`CONTRIBUTING.md`](CONTRIBUTING.md) · [`SECURITY.md`](SECURITY.md) · [`SUPPORT.md`](SUPPORT.md) ·
+[`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md).
 
 ## License
 

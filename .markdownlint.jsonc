@@ -1,0 +1,16 @@
+{
+  // markdownlint rules — https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
+  "default": true,
+  // Prose and tables run long by design; line length is not a useful signal here.
+  "MD013": false,
+  // Inline HTML is allowed (badge blocks, the occasional <br>).
+  "MD033": false,
+  // The first line may be a badge block rather than a top-level heading.
+  "MD041": false,
+  // Multi-paragraph blockquotes (Intent + a follow-up note) are an intentional doc pattern.
+  "MD028": false,
+  // Ordered lists legitimately contain fenced code blocks between items.
+  "MD029": false,
+  // Duplicate headings are fine across sections (e.g. a CHANGELOG's "Added"/"Changed").
+  "MD024": { "siblings_only": true }
+}
