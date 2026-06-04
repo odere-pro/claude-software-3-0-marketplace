@@ -15,13 +15,14 @@ documented-dirs list) and `cd`s to the repo root.
 | Gate | Protects | Severity |
 | ---- | -------- | -------- |
 | `01-json-parses` | every tracked `*.json` is valid JSON | CRITICAL |
-| `02-marketplace-shape` | the `marketplace.json` registry contract (name `odere-pro`; `github` sources; `repo == odere-pro/<name>`; no `version`/`sha`/`commit`) | CRITICAL |
+| `02-marketplace-shape` | the `marketplace.json` registry contract (name `odere-pro`; `odere-pro/<repo>` github sources; unique entry names; no `version`/`sha`/`commit`) | CRITICAL |
 | `03-no-absolute-paths` | no leaked `/Users/…` `/home/…` machine paths | CRITICAL |
 | `04-secret-scan` | no token-shaped secrets (OpenAI/GitHub/AWS/Slack/PEM) | CRITICAL |
 | `05-doc-links` | no dangling intra-repo `.md` links | CRITICAL |
 | `06-shellcheck` | gate + hook scripts lint clean (`-S error`); SKIPs if shellcheck absent | CRITICAL |
 | `07-claude-md-coverage` | every navigational layer has a `CLAUDE.md` | CRITICAL |
 | `08-markdown-lint` | markdown style; self-degrades to WARN/SKIP without `markdownlint-cli2` | advisory |
+| `09-readme-in-sync` | README Plugins table matches `marketplace.json` (runs `sync-readme.sh --check`) | CRITICAL |
 
 ## Conventions
 

@@ -62,6 +62,12 @@ for p in d.get('plugins',[]):
         if k in (p.get('source') or {}): bad.append('source.'+k)
 print(' '.join(sorted(set(bad))))" 2>/dev/null || printf '')"
   [ -z "$forbidden" ] || block "entries set forbidden key(s): $forbidden"
+  badrepo="$(printf '%s' "$CONTENT" | python3 -c "import sys,json,re
+d=json.load(sys.stdin)
+bad=[(p.get('source') or {}).get('repo','') for p in d.get('plugins',[])
+     if not re.match(r'^odere-pro/[A-Za-z0-9._-]+\$', (p.get('source') or {}).get('repo',''))]
+print(' '.join(r or '(missing)' for r in bad))" 2>/dev/null || printf '')"
+  [ -z "$badrepo" ] || block "entry source.repo must be odere-pro/<repo>: $badrepo"
   if printf '%s' "$CONTENT" | grep -qE "$SECRET_RE"; then block "content contains a secret-shaped token"; fi
   exit 0
 fi
@@ -72,5 +78,13 @@ NEW="$(read_field "i.get('new_string', json.dumps(i.get('edits','')))")"
 if printf '%s' "$NEW" | grep -qE '"(version|sha|commit)"[[:space:]]*:'; then
   block "the edit introduces a forbidden \"version\"/\"sha\"/\"commit\" key"
 fi
+# A "repo": "..." inserted by the edit must be odere-pro-owned.
+while IFS= read -r repo; do
+  [ -n "$repo" ] || continue
+  case "$repo" in
+    odere-pro/?*) ;;
+    *) block "the edit sets source.repo \"$repo\" — must be odere-pro/<repo>" ;;
+  esac
+done < <(printf '%s' "$NEW" | grep -oE '"repo"[[:space:]]*:[[:space:]]*"[^"]*"' | sed -E 's/.*:[[:space:]]*"([^"]*)"/\1/')
 if printf '%s' "$NEW" | grep -qE "$SECRET_RE"; then block "the edit introduces a secret-shaped token"; fi
 exit 0

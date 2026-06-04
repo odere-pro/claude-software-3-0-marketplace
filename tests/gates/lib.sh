@@ -20,4 +20,4 @@ GATES_MARKETPLACE=".claude-plugin/marketplace.json"
 
 # Navigational layers that must each carry a CLAUDE.md (consumed by 07-claude-md-coverage.sh).
 # shellcheck disable=SC2034
-GATES_DOCUMENTED_DIRS=".claude-plugin .github .claude tests/gates"
+GATES_DOCUMENTED_DIRS=".claude-plugin .github .claude tests/gates docs"

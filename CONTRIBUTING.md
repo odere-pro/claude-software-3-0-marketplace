@@ -6,33 +6,33 @@ CI, and an author-only `.claude/` harness.
 
 ## Adding a plugin
 
-1. The plugin must live in its **own** `odere-pro` repository and ship a valid
-   `.claude-plugin/plugin.json`. It must **not** ship its own `marketplace.json` — this registry is the
-   single marketplace named `odere-pro`, and a second repo declaring that name would shadow this one
-   (see [`.claude-plugin/CLAUDE.md`](.claude-plugin/CLAUDE.md)).
-2. Append **one** block to the `plugins` array in `.claude-plugin/marketplace.json`:
+The easy, accurate path is the agent-driven workflow — in a Claude Code session in this repo:
 
-   ```json
-   {
-     "name": "<plugin-name>",
-     "source": { "source": "github", "repo": "odere-pro/<plugin-name>" },
-     "description": "What it does — lifted from the plugin's plugin.json.",
-     "homepage": "https://github.com/odere-pro/<plugin-name>",
-     "license": "MIT",
-     "keywords": ["..."]
-   }
-   ```
+```text
+/vet-plugin <repo>     # read-only preflight: ready? what's blocking?
+/add-plugin <repo>     # vet → edit manifest + README + CHANGELOG → run gates → open a PR
+```
 
-   - `source.repo` must equal `odere-pro/<name>`. **Omit `version`** (the plugin's own `plugin.json` is
-     the version of record) and **omit `sha`/`commit`** (installs track the default branch).
-3. Add a matching row to the **Plugins** table in `README.md` and a bullet under `[Unreleased]` in
-   `CHANGELOG.md`.
-4. Run the gate suite — it must be green:
+It vets the candidate, inserts a well-formed entry, regenerates the README table, updates the
+changelog, runs the gates, and opens the PR for you. The full process, the listability contract, and
+how to clear each blocker are in [`docs/adding-plugins.md`](docs/adding-plugins.md).
 
-   ```bash
-   bash tests/gates/run-all.sh
-   claude plugin validate . --strict
-   ```
+**Requirements for a candidate** (also enforced by `tests/gates/02-marketplace-shape.sh`):
+
+- The plugin lives in its **own** `odere-pro` repo with a valid `.claude-plugin/plugin.json`
+  (`name` + `description` + `license`).
+- It ships **no** `.claude-plugin/marketplace.json` of its own — a second repo declaring the name
+  `odere-pro` would shadow this registry (see [`.claude-plugin/CLAUDE.md`](.claude-plugin/CLAUDE.md)).
+- The entry omits `version` (the plugin's own `plugin.json` is the version of record) and `sha`/`commit`.
+  The entry `name` may differ from the repo basename.
+
+**Manual fallback:** append one `github`-source block to `.claude-plugin/marketplace.json`, run
+`bash .claude/skills/add-plugin/scripts/sync-readme.sh`, add a `CHANGELOG.md` bullet, then:
+
+```bash
+bash tests/gates/run-all.sh
+claude plugin validate . --strict
+```
 
 ## Commits
 

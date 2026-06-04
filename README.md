@@ -26,10 +26,14 @@ this repo's name.
 
 ## Plugins
 
+<!-- The table below is generated from .claude-plugin/marketplace.json by
+     .claude/skills/add-plugin/scripts/sync-readme.sh. Don't edit it by hand. -->
+<!-- BEGIN PLUGINS -->
 | Plugin | Repo | What it does |
 | --- | --- | --- |
-| `claude-oop-excellence` | [odere-pro/claude-oop-excellence](https://github.com/odere-pro/claude-oop-excellence) | Language-agnostic OOP design enforcement: a read-only `/audit` front door runs RISK + PATTERN tracks in parallel into one unified report, with an audit → action handoff to gated, test-verified fixes. |
-| `claude-calibration` | [odere-pro/claude-calibration](https://github.com/odere-pro/claude-calibration) | Audit and harden a Claude Code setup via an evaluate → plan → calibrate → re-evaluate loop, promoting recurring findings into enforcement (hooks/rules/wrapper skills). |
+| `claude-oop-excellence` | [odere-pro/claude-oop-excellence](https://github.com/odere-pro/claude-oop-excellence) | Language-agnostic OOP design enforcement. A single read-only /audit front door runs two tracks in parallel — RISK (issues) and PATTERN (existing-pattern scan + pattern-fit suggestions) — into one unified report; every track / aspect / family / entity is individually selectable. Driven by a canonical glossary of 102 entities (45 issues + 57 design patterns), with glossary-driven workers fanning out per family in parallel and an audit → action handoff to gated, test-verified fix and implement commands. |
+| `claude-calibration` | [odere-pro/claude-calibration](https://github.com/odere-pro/claude-calibration) | Audit and harden a Claude Code setup: an evaluate → plan → calibrate → re-evaluate loop over CLAUDE.md, rules, settings, skills, subagents, hooks, MCP, and plugins, where recurring findings are promoted into enforcement (hooks/rules/wrapper skills). |
+<!-- END PLUGINS -->
 
 ## How it's wired
 
@@ -49,9 +53,17 @@ omit `sha`/`commit`, so installs track each plugin repo's default branch.
 
 ### Adding a plugin
 
-Append one block to the `plugins` array in `.claude-plugin/marketplace.json`, sync this table and
-`CHANGELOG.md`, and run the gates. Full steps and the manifest contract are in
-[`CONTRIBUTING.md`](CONTRIBUTING.md):
+The easy path is the agent-driven workflow — in a Claude Code session in this repo:
+
+```text
+/vet-plugin <repo>     # read-only: is the candidate ready? what's blocking?
+/add-plugin <repo>     # vet → edit manifest + README + CHANGELOG → run gates → open a PR
+```
+
+It vets the candidate (odere-pro owner, valid `plugin.json`, ships no `marketplace.json` of its own),
+inserts the entry, regenerates the table above, and opens a PR. Full process, contract, and the manual
+fallback are in [`docs/adding-plugins.md`](docs/adding-plugins.md) and
+[`CONTRIBUTING.md`](CONTRIBUTING.md). A manifest entry looks like:
 
 ```json
 {
@@ -62,6 +74,9 @@ Append one block to the `plugins` array in `.claude-plugin/marketplace.json`, sy
   "license": "MIT"
 }
 ```
+
+Entries omit `version` (the plugin's own `plugin.json` is the version of record) and `sha`/`commit`.
+The entry name may differ from the repo basename.
 
 ## Developing this registry
 

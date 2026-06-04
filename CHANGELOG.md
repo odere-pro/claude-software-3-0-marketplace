@@ -9,6 +9,12 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
 
 ### Added
 
+- Agent-driven "add a plugin" workflow: `/add-plugin` + `/vet-plugin` skills, a `plugin-onboarder`
+  worker agent, deterministic `vet-candidate` / `add-entry` / `sync-readme` scripts, a
+  `09-readme-in-sync` gate (README table generated from the manifest), and `docs/adding-plugins.md`.
+- Relaxed `02-marketplace-shape` to allow an entry `name` to differ from the repo basename (owner still
+  pinned to `odere-pro`) and to require unique entry names; `marketplace-guard` mirrors the owner rule.
+
 - GitHub best practices and a top-level `.claude/` harness: governance docs (`SECURITY.md`,
   `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODEOWNERS`), CI + supply-chain workflows
   (`ci.yml`, dormant `scorecard.yml` / `codeql.yml`, Dependabot, SHA-pinned actions), repo hygiene

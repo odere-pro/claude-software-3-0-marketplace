@@ -18,16 +18,22 @@ This repo is a **registry only**: the single source of truth is
   declaring `odere-pro` would silently shadow this one, so the name is load-bearing and pinned.
 - `owner.name` + `owner.email` are present.
 - Every `plugins[]` entry:
-  - is a **`github` source**: `"source": { "source": "github", "repo": "odere-pro/<name>" }`, where
-    `repo` equals `odere-pro/` + the entry's `name`;
+  - is a **`github` source**: `"source": { "source": "github", "repo": "odere-pro/<repo>" }`, where the
+    owner is **`odere-pro`** (registry is odere-pro-only). The entry `name` may differ from the repo
+    basename (e.g. `plugin-cookbook` lives in `claude-plugin-cookbook`);
   - carries `name`, `description`, `license` (and ideally `homepage`, `keywords`);
   - **omits `version`** — the plugin's own `plugin.json` is the version of record;
   - **omits `sha`/`commit`** — installs track the plugin repo's default branch.
 
 ## When you add or change an entry
 
+Prefer the agent-driven workflow: `/add-plugin <repo>` (and `/vet-plugin <repo>` to preflight). It vets
+the candidate, edits the manifest, regenerates the README table, updates CHANGELOG, runs the gates, and
+opens a PR. See [`docs/adding-plugins.md`](../../docs/adding-plugins.md). If editing by hand:
+
 1. The plugin must live in its own `odere-pro` repo and **must not** ship its own `marketplace.json`.
-2. Keep `README.md` (the Plugins table) and `CHANGELOG.md` (`[Unreleased]`) in sync with the manifest.
+2. Regenerate the README table with `bash .claude/skills/add-plugin/scripts/sync-readme.sh` and add a
+   `CHANGELOG.md` (`[Unreleased]`) bullet.
 3. Run `bash tests/gates/run-all.sh` and `claude plugin validate . --strict` before committing.
 
 ## Don't

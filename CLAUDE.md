@@ -22,9 +22,10 @@ This repo has **no `plugin.json` and no plugin components** (`skills/`, `agents/
 | Path | Role | Detail |
 | ---- | ---- | ------ |
 | `.claude-plugin/` | the manifest (registry payload) | [`.claude-plugin/CLAUDE.md`](.claude-plugin/CLAUDE.md) |
-| `.claude/` | dev harness: settings, hooks, rules, statusline, MCP | [`.claude/CLAUDE.md`](.claude/CLAUDE.md) |
+| `.claude/` | dev harness: settings, hooks, rules, the add-plugin skills + agent, statusline, MCP | [`.claude/CLAUDE.md`](.claude/CLAUDE.md) |
 | `.github/` | CI, supply-chain workflows, Dependabot, CODEOWNERS | [`.github/CLAUDE.md`](.github/CLAUDE.md) |
 | `tests/gates/` | the validation gate suite | [`tests/gates/CLAUDE.md`](tests/gates/CLAUDE.md) |
+| `docs/` | human-readable references (adding plugins) | [`docs/CLAUDE.md`](docs/CLAUDE.md) |
 | root docs | `SOFTWARE-3-0.md`, `CONTRIBUTING.md`, `SECURITY.md`, `SUPPORT.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md` | governance |
 | hygiene | `.editorconfig`, `.gitattributes`, `.markdownlint*.jsonc`, `.prettierrc`, `package.json` | repo config |
 
@@ -35,15 +36,16 @@ as you descend. `tests/gates/07-claude-md-coverage.sh` enforces presence for the
 
 ## How to add a plugin
 
-Append one `github`-source block to `marketplace.json`, sync the README table + CHANGELOG, run the
-gates. Full steps + the manifest contract: [`CONTRIBUTING.md`](CONTRIBUTING.md) and
+Use the agent-driven workflow: `/vet-plugin <repo>` to preflight, then `/add-plugin <repo>` to vet →
+edit manifest + README + CHANGELOG → run gates → open a PR. Full process, contract, and manual
+fallback: [`docs/adding-plugins.md`](docs/adding-plugins.md), [`CONTRIBUTING.md`](CONTRIBUTING.md), and
 [`.claude-plugin/CLAUDE.md`](.claude-plugin/CLAUDE.md).
 
 ## Gate map
 
 `bash tests/gates/run-all.sh` before any PR (CI runs the same). G1 json-parses · G2 marketplace-shape
 · G3 no-absolute-paths · G4 secret-scan · G5 doc-links · G6 shellcheck · G7 claude-md-coverage ·
-G8 markdown-lint (advisory). See [`tests/gates/CLAUDE.md`](tests/gates/CLAUDE.md).
+G8 markdown-lint (advisory) · G9 readme-in-sync. See [`tests/gates/CLAUDE.md`](tests/gates/CLAUDE.md).
 
 ## Verify before commit
 
