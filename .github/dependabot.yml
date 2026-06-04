@@ -1,0 +1,13 @@
+version: 2
+
+# This is a registry repo (Markdown + JSON + Bash) with no package manifests. The only versioned
+# dependencies are the GitHub Actions used in CI/scorecard/codeql, which are pinned by commit SHA.
+# Dependabot watches that ecosystem and bumps the SHA pins (it updates the pin and the trailing
+# `# vX.Y.Z` comment together).
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"

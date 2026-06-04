@@ -1,0 +1,84 @@
+{
+  "includeCoAuthoredBy": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git branch:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(jq:*)",
+      "Bash(shellcheck:*)",
+      "Bash(bash tests/gates/run-all.sh)",
+      "Bash(bash tests/gates/:*)",
+      "Bash(claude plugin validate:*)",
+      "Bash(bun run lint:md)",
+      "Bash(bun run format:*)",
+      "Bash(bunx markdownlint-cli2:*)"
+    ]
+  },
+  "skillOverrides": {
+    "learn": "off",
+    "learn-eval": "off",
+    "evolve": "off",
+    "instinct-import": "off",
+    "instinct-export": "off",
+    "instinct-status": "off",
+    "prune": "off",
+    "promote": "off",
+    "projects": "off",
+    "skill-create": "off",
+    "frontend-patterns": "off",
+    "multi-frontend": "off",
+    "backend-patterns": "off",
+    "multi-backend": "off",
+    "postgres-patterns": "off",
+    "database-migrations": "off",
+    "api-design": "off"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/marketplace-guard.sh\"",
+            "description": "Block marketplace.json edits that break JSON, set version/sha/commit, rename the marketplace, or embed a secret"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-commit-author.sh\"",
+            "description": "Block a git commit that sets a Claude/Anthropic author or carries an AI attribution trailer"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PROJECT_DIR}/.claude/hooks/json-format.sh\"",
+            "description": "Pretty-print edited *.json (two-space indent) when it is already valid JSON; no-op otherwise"
+          }
+        ]
+      }
+    ]
+  }
+}

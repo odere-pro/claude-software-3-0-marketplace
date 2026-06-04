@@ -1,0 +1,16 @@
+{
+  "name": "claude-software-3-0-marketplace",
+  "private": true,
+  "description": "Dev tooling for the odere-pro Claude Code marketplace registry (lint + format only; the registry ships no code).",
+  "packageManager": "bun@1.1.0",
+  "scripts": {
+    "lint:md": "markdownlint-cli2 \"**/*.md\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "gates": "bash tests/gates/run-all.sh"
+  },
+  "devDependencies": {
+    "markdownlint-cli2": "^0.14.0",
+    "prettier": "^3.3.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://github.com/odere-pro/claude-agentline/schemas/config.schema.json",
+  "version": 1,
+  "theme": "claude-code-dark",
+  "lines": [
+    {
+      "widgets": [
+        { "type": "model" },
+        { "type": "git-branch" },
+        { "type": "git-pr" },
+        { "type": "context-percentage" },
+        { "type": "tokens", "options": { "reset": "session" } },
+        { "type": "cost", "options": { "reset": "session" } }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  // Runner options for markdownlint-cli2 (rule config lives in .markdownlint.jsonc).
+  // Skip anything git ignores — node_modules, scratch files, etc.
+  "gitignore": true
+}

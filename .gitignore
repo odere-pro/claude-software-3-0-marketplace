@@ -9,3 +9,14 @@
 # Logs / scratch
 *.log
 tmp/
+
+# Dependencies
+node_modules/
+
+# Local, per-machine Claude Code config (plugin/MCP enablement, secrets)
+.claude/settings.local.json
+
+# CI / workflow artifacts
+*.tar.gz
+results.sarif
+release-notes.md
