@@ -30,12 +30,16 @@ grep -qF "$begin" "$readme" && grep -qF "$end" "$readme" || {
 blockfile="$(mktemp)"
 {
   printf '%s\n' "$begin"
-  printf '| Plugin | Repo | What it does |\n'
-  printf '| --- | --- | --- |\n'
-  jq -r '
-    .plugins[]
-    | "| `\(.name)` | [\(.source.repo)](https://github.com/\(.source.repo)) | \(.description | gsub("\n"; " ")) |"
-  ' "$manifest"
+  if [ "$(jq '.plugins | length' "$manifest")" -eq 0 ]; then
+    printf '_No plugins listed yet — add one with `/add-plugin <repo>` (see [docs/adding-plugins.md](docs/adding-plugins.md))._\n'
+  else
+    printf '| Plugin | Repo | What it does |\n'
+    printf '| --- | --- | --- |\n'
+    jq -r '
+      .plugins[]
+      | "| `\(.name)` | [\(.source.repo)](https://github.com/\(.source.repo)) | \(.description | gsub("\n"; " ")) |"
+    ' "$manifest"
+  fi
   printf '%s\n' "$end"
 } >"$blockfile"
 

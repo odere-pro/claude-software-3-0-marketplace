@@ -53,10 +53,18 @@ default branch). The entry `name` may differ from the repo basename — e.g. `pl
 - **"owner is …; lists odere-pro repos only"** — only `odere-pro`-owned repos can be listed.
 - **"already listed"** — it's already in the marketplace; nothing to do.
 
+## Empty registry
+
+The marketplace starts with **no plugins**; they're added one at a time (after testing) via
+`/add-plugin`. While the `plugins` array is empty, `bash tests/gates/run-all.sh` is green, but
+`claude plugin validate --strict` warns "Marketplace has no plugins defined" — that's expected. The
+gate suite is the authoritative check; `--strict` validation becomes meaningful once the first plugin
+is listed.
+
 ## Manual fallback
 
 If you'd rather edit by hand: append one `github`-source block to the `plugins` array in
 `.claude-plugin/marketplace.json` (no `version`/`sha`), run
 `bash .claude/skills/add-plugin/scripts/sync-readme.sh`, add a `CHANGELOG.md` bullet, then
-`bash tests/gates/run-all.sh` and `claude plugin validate . --strict`. See
+`bash tests/gates/run-all.sh` (and `claude plugin validate .`). See
 [`CONTRIBUTING.md`](../CONTRIBUTING.md).

@@ -24,7 +24,7 @@ problems="$(jq -r '
   ( [ (if .name == "odere-pro" then empty else "top-level name must be \"odere-pro\" (got \(.name | tojson))" end),
       (if (.owner.name // "") != "" then empty else "owner.name missing" end),
       (if (.owner.email // "") != "" then empty else "owner.email missing" end),
-      (if (.plugins | type) == "array" and (.plugins | length) > 0 then empty else "plugins must be a non-empty array" end),
+      (if (.plugins | type) == "array" then empty else "plugins must be an array (it may be empty — the registry can start with no plugins)" end),
       ( ([.plugins[]?.name] | group_by(.) | map(select(length > 1)[0]) | unique[]?) as $dup
         | "duplicate plugin name \"\($dup)\" (entry names must be unique)" )
     ]

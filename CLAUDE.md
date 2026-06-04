@@ -50,6 +50,10 @@ G8 markdown-lint (advisory) · G9 readme-in-sync. See [`tests/gates/CLAUDE.md`](
 ## Verify before commit
 
 ```bash
-claude plugin validate . --strict     # manifest validates
-bash tests/gates/run-all.sh           # full gate suite is green
+bash tests/gates/run-all.sh           # full gate suite is green (the authoritative check; CI runs this)
+claude plugin validate .              # manifest validates
 ```
+
+> While the registry is **empty**, `claude plugin validate --strict` warns "Marketplace has no plugins
+> defined" (a warning `--strict` promotes to failure). That's expected — the gate suite is the green
+> check; `--strict` becomes meaningful once the first plugin is listed via `/add-plugin`.

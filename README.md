@@ -11,6 +11,9 @@ aggregated here, so you add this marketplace once and install any plugin individ
 The marketplace `name` is **`odere-pro`** — installs are always `<plugin>@odere-pro`, regardless of
 this repo's name.
 
+> **Status:** the registry is starting **empty** — plugins are added one at a time (after testing) via
+> the [`/add-plugin`](#adding-a-plugin) workflow. The list below is the source of truth.
+
 ## Add the marketplace
 
 ```text
@@ -19,9 +22,10 @@ this repo's name.
 
 ## Install plugins
 
+No plugins are listed yet (see the table below). Once a plugin is listed, install it with:
+
 ```text
-/plugin install claude-oop-excellence@odere-pro
-/plugin install claude-calibration@odere-pro
+/plugin install <plugin>@odere-pro
 ```
 
 ## Plugins
@@ -29,10 +33,7 @@ this repo's name.
 <!-- The table below is generated from .claude-plugin/marketplace.json by
      .claude/skills/add-plugin/scripts/sync-readme.sh. Don't edit it by hand. -->
 <!-- BEGIN PLUGINS -->
-| Plugin | Repo | What it does |
-| --- | --- | --- |
-| `claude-oop-excellence` | [odere-pro/claude-oop-excellence](https://github.com/odere-pro/claude-oop-excellence) | Language-agnostic OOP design enforcement. A single read-only /audit front door runs two tracks in parallel — RISK (issues) and PATTERN (existing-pattern scan + pattern-fit suggestions) — into one unified report; every track / aspect / family / entity is individually selectable. Driven by a canonical glossary of 102 entities (45 issues + 57 design patterns), with glossary-driven workers fanning out per family in parallel and an audit → action handoff to gated, test-verified fix and implement commands. |
-| `claude-calibration` | [odere-pro/claude-calibration](https://github.com/odere-pro/claude-calibration) | Audit and harden a Claude Code setup: an evaluate → plan → calibrate → re-evaluate loop over CLAUDE.md, rules, settings, skills, subagents, hooks, MCP, and plugins, where recurring findings are promoted into enforcement (hooks/rules/wrapper skills). |
+_No plugins listed yet — add one with `/add-plugin <repo>` (see [docs/adding-plugins.md](docs/adding-plugins.md))._
 <!-- END PLUGINS -->
 
 ## How it's wired

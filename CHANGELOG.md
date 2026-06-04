@@ -19,4 +19,4 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
   `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CONTRIBUTING.md`, `CODEOWNERS`), CI + supply-chain workflows
   (`ci.yml`, dormant `scorecard.yml` / `codeql.yml`, Dependabot, SHA-pinned actions), repo hygiene
   configs, a `tests/gates/` validation suite, a `SOFTWARE-3-0.md`, and nested `CLAUDE.md` navigation.
-- Initial registry: `claude-oop-excellence` and `claude-calibration`, each as a `github` source.
+- The registry starts **empty** — plugins are added one at a time (after testing) via `/add-plugin`.

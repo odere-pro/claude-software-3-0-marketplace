@@ -30,9 +30,13 @@ how to clear each blocker are in [`docs/adding-plugins.md`](docs/adding-plugins.
 `bash .claude/skills/add-plugin/scripts/sync-readme.sh`, add a `CHANGELOG.md` bullet, then:
 
 ```bash
-bash tests/gates/run-all.sh
-claude plugin validate . --strict
+bash tests/gates/run-all.sh          # authoritative check (CI runs this)
+claude plugin validate .
 ```
+
+> The registry starts **empty**. While there are zero entries, `claude plugin validate --strict` warns
+> "Marketplace has no plugins defined" — expected; the gate suite is the green check. Once the first
+> plugin is listed, `--strict` is meaningful again.
 
 ## Commits
 
