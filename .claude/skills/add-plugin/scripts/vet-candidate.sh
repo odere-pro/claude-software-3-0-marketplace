@@ -38,6 +38,7 @@ name_from_repo="${REPO##*/}"
 # The verdict-shape gate (tests/gates/10-vet-verdict-schema.sh) asserts each blocker carries all three.
 # VET_CODES: OWNER_NOT_ALLOWED PLUGIN_JSON_UNREADABLE PLUGIN_JSON_INVALID SHIPS_MARKETPLACE_JSON
 #            MISSING_NAME MISSING_DESCRIPTION MISSING_LICENSE LICENSE_NOT_ALLOWED ALREADY_LISTED
+#            NO_COMPONENTS
 #
 # SPDX license allowlist (roadmap P10 / D14): permissive + file-level weak copyleft only. Shared
 # by-value with tests/gates/02-marketplace-shape.sh (the G2 license check); the two sites are kept
@@ -79,6 +80,26 @@ if gh api "repos/$REPO/contents/.claude-plugin/marketplace.json" >/dev/null 2>&1
   add_blocker "SHIPS_MARKETPLACE_JSON" \
     "$REPO still ships .claude-plugin/marketplace.json — remove it first (see docs/adding-plugins.md)" \
     "git rm .claude-plugin/marketplace.json in the candidate repo (keep plugin.json), then re-run the vet"
+fi
+
+# Component probe (roadmap D-component-check): a plugin must ship at least one component directory
+# (commands/agents/skills/hooks). A repo with a valid plugin.json but no components is an empty shell.
+# CONSTANT-COST (D12): we probe each dir name via the `contents/<dir>` API and STOP at the first hit —
+# at most 4 `gh api` calls, never a recursive tree walk. Rides the existing add-time gh-api budget.
+# Only run when plugin.json is readable (if it isn't, PLUGIN_JSON_UNREADABLE already covers it).
+if [ -n "$pj" ]; then
+  has_component=false
+  for dir in commands agents skills hooks; do
+    if gh api "repos/$REPO/contents/$dir" >/dev/null 2>&1; then
+      has_component=true
+      break
+    fi
+  done
+  if ! $has_component; then
+    add_blocker "NO_COMPONENTS" \
+      "$REPO ships no plugin component directory (commands/, agents/, skills/, or hooks/) — a plugin with no components is an empty shell" \
+      "add at least one component directory (commands/, agents/, skills/, or hooks/) to the candidate repo, then re-run the vet"
+  fi
 fi
 
 # Extract fields from the candidate plugin.json (empty string if absent).

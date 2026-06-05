@@ -5,7 +5,15 @@ Author-only. Continuous integration and the supply-chain hardening for the regis
 ## Workflows (`workflows/`)
 
 - **`ci.yml`** — always-on (every push + PR). Installs `jq` + `shellcheck` and runs
-  `bash tests/gates/run-all.sh`. This is the gate that must stay green.
+  `bash tests/gates/run-all.sh`. This is the gate that must stay green. The checkout uses
+  `fetch-depth: 0` (full history) so the commit-author backstop gate `17-commit-author.sh` can scan
+  every commit (roadmap P14/D15). It also carries two PR-only jobs:
+  - **`history-secret-scan`** — runs `gitleaks/gitleaks-action` (SHA-pinned) over the full git
+    history to FAIL the PR on any committed secret (roadmap P-history-secret-scan; active now, the
+    repo is public, D16). It shares the same `fetch-depth: 0` checkout pattern. **Org note:**
+    gitleaks-action requires `GITLEAKS_LICENSE` for **org-owned** repos — set it as a repo secret
+    (gitleaks.io) or the action errors. It runs only on `pull_request`, so it never blocks a push.
+  - **`reproducible-diff`** — see below.
 - **`scorecard.yml`** — OpenSSF Scorecard. **Dormant**: only `workflow_dispatch` is active; the
   `schedule`/`push` triggers are commented out because the public Scorecard API + code-scanning
   upload need a **public** repo. Uncomment them when the repo goes public.

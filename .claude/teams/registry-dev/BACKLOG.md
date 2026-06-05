@@ -114,15 +114,15 @@ surfaces were red-teamed. Final `bash tests/gates/run-all.sh` green (15 gates: G
 | P13h | G9 green; one `sync-readme.sh` extension renders License + Keywords columns | PASS | 5-column table verified in sandbox (License from `.license`, Keywords joined with `—` fallback); empty-state path unchanged → G9 green |
 | P15 | Re-running reproduces post-format structural bytes (excl. description/keywords); gates green; merge stays CODEOWNERS | PASS | `.github/scripts/reproducible-diff.sh` (canonical `jq --indent 2`, matches `json-format.sh`) passes at N=0, FAILs on non-canonical bytes / bad owner / forbidden key; wired as a PR-only CI job; NOT in `run-all.sh`; not auto-merge (D7) |
 
-## Phase 2 (not in scope this run)
+## Phase 2 (in flight — supply-chain hardening; Phase 0+1 committed)
 
 | ID | Item | Lane | Depends on | Acceptance (gate/check) | Status |
 | --- | --- | --- | --- | --- | --- |
-| P12a | Actions-pinned gate `15-actions-pinned.sh` | A/C | Phase 0 | Passes SHA-pinned workflows; FAILs `actions/checkout@v6`; allows `./` local reusable | todo |
-| P12b | Workflow-permissions gate `16-workflow-permissions.sh` | A/C | Phase 0 | FAILs `write-all` / non-allowlisted `contents: write` | todo |
-| P14 | CI commit-author backstop gate `17-commit-author.sh` (atomic with `fetch-depth: 0`) | A/C | Phase 0 | Gate + `fetch-depth` land in one PR (D15); FAILs a Claude-author commit; passes current history | todo |
-| P-history-secret-scan | gitleaks (SHA-pinned, active now) | C | Phase 0 | Runs on PR, SHA-pinned, shares P14 checkout; FAILs a planted history secret (D16) | todo |
-| D-component-check | constant-cost component probe in vet | B | Phase 0 | Vet blocker when no component dir via `contents/skills` probe (not recursive); rides add-time budget (D12) | todo |
+| P12a | Actions-pinned gate `15-actions-pinned.sh` | A/C | Phase 0 | Passes SHA-pinned workflows; FAILs `actions/checkout@v6`; allows `./` local reusable | PASS |
+| P12b | Workflow-permissions gate `16-workflow-permissions.sh` | A/C | Phase 0 | FAILs `write-all` / non-allowlisted `contents: write` | PASS |
+| P14 | CI commit-author backstop gate `17-commit-author.sh` (atomic with `fetch-depth: 0`) | A/C | Phase 0 | Gate + `fetch-depth` land in one PR (D15); FAILs a Claude-author commit; passes current history | PASS |
+| P-history-secret-scan | gitleaks (SHA-pinned, active now) | C | Phase 0 | Runs on PR, SHA-pinned, shares P14 checkout; FAILs a planted history secret (D16) | PASS |
+| D-component-check | constant-cost component probe in vet | B | Phase 0 | Vet blocker when no component dir via `contents/skills` probe (not recursive); rides add-time budget (D12) | PASS |
 
 ## Phase 3 (PM's go only — not in scope this run)
 

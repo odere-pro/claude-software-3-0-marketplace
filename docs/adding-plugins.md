@@ -27,6 +27,10 @@ A candidate is ready when **all** of these hold (enforced by
 
 - **Owner is `odere-pro`.** The registry is odere-pro-only.
 - **It has a valid `.claude-plugin/plugin.json`** with `name`, `description`, and `license`.
+- **It ships at least one component directory** — `commands/`, `agents/`, `skills/`, or `hooks/`. A
+  plugin with a `plugin.json` but no components is an empty shell. The vet probes these directories
+  directly (a constant-cost `contents/<dir>` check, stopping at the first one found — never a
+  recursive tree walk), so it stays within the add-time API budget.
 - **It ships no `.claude-plugin/marketplace.json` of its own.** A second repo declaring the marketplace
   name `odere-pro` silently shadows this registry — the collision that broke installs before. The
   plugin must be plugin-only.
@@ -52,6 +56,7 @@ automatically, but you can self-check first:
 - [ ] `plugin.json` has a non-empty **`name`**, **`description`**, and an SPDX **`license`** in the
       allowlist (`MIT Apache-2.0 BSD-2-Clause BSD-3-Clause ISC 0BSD MPL-2.0`).
 - [ ] The repo ships **no `.claude-plugin/marketplace.json`** of its own (it would shadow this registry).
+- [ ] The repo ships **at least one component directory** (`commands/`, `agents/`, `skills/`, or `hooks/`).
 - [ ] `description` is ≥ 20 characters and is not just the `name`; `keywords` lists ≥ 1 term;
       `homepage` (if set) starts with `https://`.
 
@@ -87,6 +92,9 @@ gh api repos/<owner>/<repo>/contents/.claude-plugin/plugin.json --jq '.content' 
   `claude-calibration`: branch off `main`, `git rm .claude-plugin/marketplace.json`, keep `plugin.json`,
   PR. Then re-run `/add-plugin`.
 - **"owner is …; lists odere-pro repos only"** — only `odere-pro`-owned repos can be listed.
+- **"ships no plugin component directory"** — add at least one of `commands/`, `agents/`, `skills/`,
+  or `hooks/` to the candidate repo (a plugin needs at least one component to do anything), then
+  re-run the vet.
 - **"already listed"** — it's already in the marketplace; nothing to do.
 
 ## Updating or replacing a plugin

@@ -29,6 +29,9 @@ documented-dirs list) and `cd`s to the repo root.
 | `12-skill-failure-handling` | every skill `SKILL.md` carries a `## Failure handling` section; the three write skills document the staged-AND-dirty rollback (`git restore --staged …` + `git restore …`) (roadmap P13a) | CRITICAL |
 | `13-skill-frontmatter` | each skill `SKILL.md` declares the required front-matter (`name`/`description`/`model`/`allowed-tools`); missing `argument-hint` is a WARN, not a FAIL (roadmap P13b) | CRITICAL |
 | `14-skill-script-paths` | every `bash .claude/skills/.../scripts/<x>.sh` reference in a `SKILL.md` or agent resolves to a real file (roadmap P13c) | CRITICAL |
+| `15-actions-pinned` | every external `uses:` in `.github/workflows/*.yml` is pinned by a full 40-char commit SHA (OpenSSF Pinned-Dependencies); `./`-local reusable workflows are exempt (roadmap P12a); static, offline | CRITICAL |
+| `16-workflow-permissions` | no workflow declares `permissions: write-all`, and `contents: write` is forbidden unless allowlisted (empty today); narrow scopes like `security-events`/`id-token` `write` are fine (roadmap P12b); static, offline | CRITICAL |
+| `17-commit-author` | no commit reachable from HEAD carries a Claude/Anthropic author/committer identity or AI-attribution trailer — CI backstop mirroring `guard-commit-author.sh` (roadmap P14); needs full history (`ci.yml` uses `fetch-depth: 0`, D15); local git only, SKIPs without git/commits | CRITICAL |
 
 ## Conventions
 
