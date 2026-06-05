@@ -35,6 +35,12 @@ this is a registry, not a plugin.
   `^odere-pro/[A-Za-z0-9._-]+$`). The entry `name` may differ from the repo basename — e.g.
   `plugin-cookbook` lives in `odere-pro/claude-plugin-cookbook`. Entry names are unique.
 - **Each entry carries** `name`, `description`, `license` (plus `homepage`, `keywords` by convention).
+- **Listing-quality floors (G2):** `description` is non-empty, ≥ 20 chars, and not a verbatim repeat of
+  `name`; `keywords` is non-empty; `homepage` (when set) matches `^https://`. The top-level
+  marketplace `description` is also non-empty. A generic-keyword denylist stays **advisory** (curation
+  drops noise like `claude-code`/`plugin`; it does not block).
+- **`$schema` is pinned** to `https://json.schemastore.org/claude-code-marketplace.json` (exact
+  string-equality, checked by G2 with no network call).
 - **No `version`** on any entry — the plugin's own `plugin.json` is the version of record.
 - **No `sha`/`commit`** — installs track the plugin repo's default branch.
 

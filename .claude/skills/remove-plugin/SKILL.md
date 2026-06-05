@@ -34,3 +34,18 @@ Remove a listed plugin from the marketplace, all the way to a PR. `$ARGUMENTS` i
 - Touches only `.claude-plugin/marketplace.json`, `README.md`, `CHANGELOG.md`; never the plugin's own
   repo.
 - Removal is by entry `name`; to change a plugin instead of dropping it, use `/update-plugin`.
+
+## Failure handling
+
+If any step fails (the name isn't listed, a gate goes red, or the PR push fails), **stop and roll
+back** so the working tree is left exactly as it started — never half applied. Undo both the staged
+and the working-tree state of the three files this skill touches:
+
+```bash
+git restore --staged .claude-plugin/marketplace.json README.md CHANGELOG.md
+git restore .claude-plugin/marketplace.json README.md CHANGELOG.md
+```
+
+`git restore --staged …` first unstages anything `git add`ed in step 4; the second `git restore …`
+discards the working-tree edits from steps 1–2. Then report what failed and what you reverted. Do not
+commit or push a partial change.

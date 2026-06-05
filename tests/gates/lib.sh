@@ -19,5 +19,8 @@ gates_frontmatter() {
 GATES_MARKETPLACE=".claude-plugin/marketplace.json"
 
 # Navigational layers that must each carry a CLAUDE.md (consumed by 07-claude-md-coverage.sh).
+# Flat space-separated list, iterated linearly by G7 (one stat per entry) — this is intentionally a
+# flat enumeration, not a recursive walk: it stays O(documented-layers) and dependency-free. If the
+# layer count grows past a couple dozen, revisit whether a `find -name CLAUDE.md` walk is cheaper.
 # shellcheck disable=SC2034
-GATES_DOCUMENTED_DIRS=".claude-plugin .github .claude tests/gates docs"
+GATES_DOCUMENTED_DIRS=".claude-plugin .github .claude tests/gates docs docs/brainstorm docs/plan .claude/teams"

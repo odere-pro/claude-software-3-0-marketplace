@@ -69,5 +69,10 @@ jq --indent 2 \
   ' "$manifest" >"$tmp"
 
 mv "$tmp" "$manifest"
-echo "added \"$name\" ($repo) to $MK_MANIFEST" >&2
+
+# Deterministic changelog bullet (roadmap P8): record the listing under [Unreleased] → Added so the
+# changelog tracks the manifest without a hand-written step. 11-changelog-in-sync.sh gates this.
+mk_changelog_bullet "Added" "List \`$name\` (\`$repo\`)."
+
+echo "added \"$name\" ($repo) to $MK_MANIFEST (changelog updated)" >&2
 echo "$name"

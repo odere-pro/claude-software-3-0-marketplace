@@ -27,3 +27,10 @@ Edits nothing — use `/add-plugin` to actually list it.
    - **Blocked** (`ok: false`) → list each `blockers[]` item with the fix. For "still ships
      marketplace.json", point to [`docs/adding-plugins.md`](../../../docs/adding-plugins.md) and the
      oop/calibration-style removal.
+
+## Failure handling
+
+This skill is **read-only** — it edits no files, so there is nothing to roll back. If
+`vet-candidate.sh` errors (exit 2: missing argument or `gh`/`jq` not installed, or a `gh` auth/network
+failure), report the error and stop; no working-tree state changed. The actual listing change happens
+only under `/add-plugin`, which carries its own rollback.

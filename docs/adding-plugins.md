@@ -27,15 +27,49 @@ A candidate is ready when **all** of these hold (enforced by
 
 - **Owner is `odere-pro`.** The registry is odere-pro-only.
 - **It has a valid `.claude-plugin/plugin.json`** with `name`, `description`, and `license`.
+- **It ships at least one component directory** — `commands/`, `agents/`, `skills/`, or `hooks/`. A
+  plugin with a `plugin.json` but no components is an empty shell. The vet probes these directories
+  directly (a constant-cost `contents/<dir>` check, stopping at the first one found — never a
+  recursive tree walk), so it stays within the add-time API budget.
 - **It ships no `.claude-plugin/marketplace.json` of its own.** A second repo declaring the marketplace
   name `odere-pro` silently shadows this registry — the collision that broke installs before. The
   plugin must be plugin-only.
 - **It isn't already listed** here.
+- **The listing meets the quality floors** (G2 enforces these on every entry): `description` is
+  non-empty, at least 20 characters, and is not just a repeat of the entry `name`; `keywords` lists at
+  least one term; and `homepage` (when present) starts with `https://`. These keep each listing
+  useful for discovery rather than a bare stub. The generic-keyword denylist
+  (e.g. `claude-code`, `plugin`) is **advisory** — `plugin-onboarder` drops generic noise during
+  curation, but a generic keyword does not by itself block a listing.
 
 The entry written into `marketplace.json` is always a `github` source with **no `version`** (the
 plugin's own `plugin.json` is the version of record) and **no `sha`/`commit`** (installs track the
 default branch). The entry `name` may differ from the repo basename — e.g. `plugin-cookbook` lives in
 `odere-pro/claude-plugin-cookbook`.
+
+## Pre-submission checklist (candidate repo)
+
+Before `/add-plugin`, confirm the candidate repo satisfies the contract. The vet runs all of this
+automatically, but you can self-check first:
+
+- [ ] The repo is **`odere-pro`-owned** and is a plugin (ships `.claude-plugin/plugin.json`).
+- [ ] `plugin.json` has a non-empty **`name`**, **`description`**, and an SPDX **`license`** in the
+      allowlist (`MIT Apache-2.0 BSD-2-Clause BSD-3-Clause ISC 0BSD MPL-2.0`).
+- [ ] The repo ships **no `.claude-plugin/marketplace.json`** of its own (it would shadow this registry).
+- [ ] The repo ships **at least one component directory** (`commands/`, `agents/`, `skills/`, or `hooks/`).
+- [ ] `description` is ≥ 20 characters and is not just the `name`; `keywords` lists ≥ 1 term;
+      `homepage` (if set) starts with `https://`.
+
+Validate the candidate's `plugin.json` shape locally with one `jq` line (no schema file is hosted
+here — the SPDX allowlist and field rules live in `vet-candidate.sh` + `02-marketplace-shape.sh`, so
+there is nothing to version-drift):
+
+```bash
+gh api repos/<owner>/<repo>/contents/.claude-plugin/plugin.json --jq '.content' | base64 -d \
+  | jq -e 'has("name") and has("description") and has("license")
+           and (.name|length>0) and (.description|length>=20) and (.license|length>0)' \
+  && echo "plugin.json has the required fields" || echo "plugin.json is missing a required field"
+```
 
 ## How it works (the pieces)
 
@@ -58,6 +92,9 @@ default branch). The entry `name` may differ from the repo basename — e.g. `pl
   `claude-calibration`: branch off `main`, `git rm .claude-plugin/marketplace.json`, keep `plugin.json`,
   PR. Then re-run `/add-plugin`.
 - **"owner is …; lists odere-pro repos only"** — only `odere-pro`-owned repos can be listed.
+- **"ships no plugin component directory"** — add at least one of `commands/`, `agents/`, `skills/`,
+  or `hooks/` to the candidate repo (a plugin needs at least one component to do anything), then
+  re-run the vet.
 - **"already listed"** — it's already in the marketplace; nothing to do.
 
 ## Updating or replacing a plugin

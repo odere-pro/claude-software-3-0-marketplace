@@ -47,3 +47,18 @@ plus optional `--name <name>` to override the entry name.
 - odere-pro repos only; never edits a candidate's own repository (block-with-instructions).
 - Touches only `.claude-plugin/marketplace.json`, `README.md`, `CHANGELOG.md`.
 - Never sets `version`/`sha`/`commit` on an entry; the scripts and the `marketplace-guard` hook enforce it.
+
+## Failure handling
+
+If any step fails (a blocker surfaces, a gate goes red, `claude plugin validate` errors, or the PR
+push fails), **stop and roll back** so the working tree is left exactly as it started — never half
+applied. Undo both the staged and the working-tree state of the three files this skill touches:
+
+```bash
+git restore --staged .claude-plugin/marketplace.json README.md CHANGELOG.md
+git restore .claude-plugin/marketplace.json README.md CHANGELOG.md
+```
+
+`git restore --staged …` first unstages anything `git add`ed in step 6; the second `git restore …`
+discards the working-tree edits from steps 3–4. Then report what failed and what you reverted. Do not
+commit or push a partial change.

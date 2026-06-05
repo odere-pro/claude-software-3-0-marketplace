@@ -78,5 +78,17 @@ jq --indent 2 \
      else . end))' "$manifest" >"$tmp"
 
 mv "$tmp" "$manifest"
-echo "updated \"$name\" -> \"$new_name\" ($repo) in $MK_MANIFEST" >&2
+
+# Deterministic changelog bullet (roadmap P8): record the change under [Unreleased] → Changed. The
+# bullet names the entry as it now stands so the listed name is always present in the changelog
+# (11-changelog-in-sync.sh gates this). Distinguish rename / repoint / refresh.
+if [ "$new_name" != "$name" ]; then
+  mk_changelog_bullet "Changed" "Rename \`$name\` to \`$new_name\` (\`$repo\`)."
+elif [ -n "$o_repo" ] && [ "$o_repo" != "$cur_repo" ]; then
+  mk_changelog_bullet "Changed" "Repoint \`$new_name\` to \`$repo\`."
+else
+  mk_changelog_bullet "Changed" "Update \`$new_name\` (\`$repo\`)."
+fi
+
+echo "updated \"$name\" -> \"$new_name\" ($repo) in $MK_MANIFEST (changelog updated)" >&2
 echo "$new_name"

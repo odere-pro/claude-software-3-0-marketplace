@@ -3,17 +3,16 @@ name: scorecard
 # OpenSSF Scorecard analysis. Backs the "OpenSSF Scorecard" badge — publish_results: true uploads
 # the score to the public Scorecard API so the badge renders.
 #
-# DORMANT until this repo is PUBLIC: the public Scorecard API and code-scanning upload require a
-# public repo. Until then only the manual `workflow_dispatch` trigger is active. When the repo goes
-# public, uncomment the `schedule` / `push` / `branch_protection_rule` triggers below.
+# ACTIVE: this repo is PUBLIC (Q2/D16), so the public Scorecard API + code-scanning upload work. Runs
+# on a weekly schedule, push to `main`, branch-protection changes, and manual `workflow_dispatch`.
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: "27 4 * * 1" # weekly, Monday 04:27 UTC
-  # push:
-  #   branches: ["main"]
-  # branch_protection_rule:
+  schedule:
+    - cron: "27 4 * * 1" # weekly, Monday 04:27 UTC
+  push:
+    branches: ["main"]
+  branch_protection_rule:
 
 permissions: read-all
 

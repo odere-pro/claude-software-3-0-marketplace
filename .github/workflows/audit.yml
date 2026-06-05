@@ -1,0 +1,69 @@
+name: cross-repo-audit
+
+# Consolidated cross-repo provenance audit (roadmap P4, Phase 3 — thesis 2/5). SCHEDULED + manual.
+#
+# Re-derives, live, for every plugin listed in marketplace.json: the listed repo exists and its
+# plugin.json is fetchable/valid, source.repo matches odere-pro/<repo>, and the listed repo ships no
+# marketplace.json of its own (D13: it does NOT compare entry.name to plugin.json.name). It reuses the
+# vet-candidate.sh probes (DRY) via .github/scripts/audit-cross-repo.sh.
+#
+# ADVISORY / notify-only (D3): it NEVER hard-FAILs and is NOT a tests/gates push-suite gate (no
+# network in run-all.sh, D3/D4). It SKIPs on any non-200 / network / gh-auth error and is a no-op
+# while the registry is empty (N=0). On detected drift it opens or updates ONE tracking GitHub issue
+# (D17/Q1) — the notify channel.
+#
+# Auth (D17/Q1): the default GITHUB_TOKEN (no extra secret) reads the public plugin repos and files
+# the issue. Least privilege (G16): contents:read to read the checked-out manifest/scripts;
+# issues:write only for the notify. No contents:write, no write-all.
+
+on:
+  schedule:
+    - cron: "17 5 * * 1" # weekly, Monday 05:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: cross-repo provenance audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # read the checked-out manifest + scripts
+      issues: write # open/update the drift tracking issue (the notify channel, D17)
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Re-derive cross-repo provenance (advisory)
+        id: audit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # default token; reads public repos + files the issue
+        run: |
+          report="$(bash .github/scripts/audit-cross-repo.sh)"
+          echo "$report"
+          status="$(printf '%s' "$report" | jq -r '.status')"
+          {
+            echo "status=$status"
+            echo "report<<AUDIT_EOF"
+            printf '%s\n' "$report"
+            echo "AUDIT_EOF"
+          } >>"$GITHUB_OUTPUT"
+
+      - name: Open or update the drift tracking issue
+        if: steps.audit.outputs.status == 'drift'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pass the report via env, NOT via ${{ }} interpolation into the run body, so no value can
+          # break out of the shell context (GitHub Actions expression-injection hardening).
+          AUDIT_REPORT: ${{ steps.audit.outputs.report }}
+        run: |
+          title="cross-repo audit: provenance drift detected"
+          body="$(printf '%s' "$AUDIT_REPORT" \
+            | jq -r '"The scheduled cross-repo audit (.github/workflows/audit.yml) re-derived the\nlisted plugins and found provenance drift:\n\n" + (([.drift[] | "- **\(.name)** (`\(.repo)`):\n" + ([.problems[] | "  - `\(.code)` — \(.message)"] | join("\n"))] | join("\n"))) + "\n\nThis is an advisory notice (D3). Run `/update-plugin` or `/remove-plugin` to reconcile the\nmanifest, or fix the listed repo. This issue auto-updates on the next run; close it once resolved."')"
+          existing="$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body" --label "provenance-drift" 2>/dev/null \
+              || gh issue create --title "$title" --body "$body"
+          fi

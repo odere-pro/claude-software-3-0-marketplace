@@ -4,8 +4,9 @@
 # tests/gates/02-marketplace-shape.sh; this gives immediate feedback before a bad edit lands.
 #
 # Blocks (exit 2) when an edit to marketplace.json would:
-#   - (Write) produce invalid JSON, or set a forbidden `version`/`sha`/`commit`, or change the
-#     top-level name away from "odere-pro", or embed a secret-shaped token;
+#   - (Write) produce invalid JSON, drop/change the pinned top-level `$schema`, set a forbidden
+#     `version`/`sha`/`commit`, change the top-level name away from "odere-pro", or embed a
+#     secret-shaped token;
 #   - (Edit/MultiEdit) introduce a `"version"`/`"sha"`/`"commit"` key or a secret-shaped token.
 # Zero-cost (exit 0) for any other tool or file.
 set -euo pipefail
@@ -41,7 +42,11 @@ block() {
   echo "[marketplace-guard] marketplace.json must stay a clean registry index:" >&2
   echo "[marketplace-guard]   - valid JSON, top-level name \"odere-pro\"" >&2
   echo "[marketplace-guard]   - entries omit version (plugin.json is the version of record) and sha/commit" >&2
-  echo "[marketplace-guard]   - no secret-shaped tokens. See .claude/rules/marketplace-dev.md." >&2
+  echo "[marketplace-guard]   - no secret-shaped tokens." >&2
+  # Cite the authoritative gate + the contract doc so the fix path is explicit (roadmap P13e).
+  echo "[marketplace-guard] policy: G2 / tests/gates/02-marketplace-shape.sh (the authoritative full check)." >&2
+  echo "[marketplace-guard] remediation: fix the edit to satisfy the rule above, then re-run; verify with" >&2
+  echo "[marketplace-guard]   bash tests/gates/run-all.sh. Contract detail: .claude/rules/marketplace-dev.md." >&2
   exit 2
 }
 
@@ -52,6 +57,14 @@ if [ "$TOOL" = "Write" ]; then
     || block "the new content is not valid JSON"
   name="$(printf '%s' "$CONTENT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('name',''))" 2>/dev/null || printf '')"
   [ "$name" = "odere-pro" ] || block "top-level name must be \"odere-pro\" (got \"$name\")"
+  schema="$(printf '%s' "$CONTENT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('\$schema',''))" 2>/dev/null || printf '')"
+  [ "$schema" = "https://json.schemastore.org/claude-code-marketplace.json" ] \
+    || block "top-level \$schema must be \"https://json.schemastore.org/claude-code-marketplace.json\" (got \"$schema\")"
+  # Structural mirror only (D2): the top-level description must be present on a full Write. Per-field
+  # listing-quality floors (description length, description != name, keywords, homepage scheme) live
+  # in G2 alone — they would false-block when applied to a fragment, so the hook does not mirror them.
+  desc="$(printf '%s' "$CONTENT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('description',''))" 2>/dev/null || printf '')"
+  [ -n "$desc" ] || block "top-level description is empty (the marketplace needs a one-line description)"
   forbidden="$(printf '%s' "$CONTENT" | python3 -c "import sys,json
 d=json.load(sys.stdin)
 bad=[]
