@@ -42,7 +42,11 @@ block() {
   echo "[marketplace-guard] marketplace.json must stay a clean registry index:" >&2
   echo "[marketplace-guard]   - valid JSON, top-level name \"odere-pro\"" >&2
   echo "[marketplace-guard]   - entries omit version (plugin.json is the version of record) and sha/commit" >&2
-  echo "[marketplace-guard]   - no secret-shaped tokens. See .claude/rules/marketplace-dev.md." >&2
+  echo "[marketplace-guard]   - no secret-shaped tokens." >&2
+  # Cite the authoritative gate + the contract doc so the fix path is explicit (roadmap P13e).
+  echo "[marketplace-guard] policy: G2 / tests/gates/02-marketplace-shape.sh (the authoritative full check)." >&2
+  echo "[marketplace-guard] remediation: fix the edit to satisfy the rule above, then re-run; verify with" >&2
+  echo "[marketplace-guard]   bash tests/gates/run-all.sh. Contract detail: .claude/rules/marketplace-dev.md." >&2
   exit 2
 }
 

@@ -9,6 +9,11 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
 
 ### Added
 
+- Operability-core gates: `11-changelog-in-sync` (every listed plugin named in the changelog),
+  `12-skill-failure-handling` (each `SKILL.md` documents rollback), `13-skill-frontmatter` (required
+  skill front-matter), `14-skill-script-paths` (skill script references resolve); deterministic
+  CHANGELOG bullets from the add/update/remove scripts; README **License**/**Keywords** columns; a
+  PR-scoped `reproducible-diff` CI check for the manifest's structural fields (not auto-merge).
 - `/update-plugin` (refresh / `--repo` repoint / `--name` rename) and `/remove-plugin` skills, with
   `update-entry.sh` / `remove-entry.sh` and a `--skip-listed-check` mode on `vet-candidate.sh`.
 - Agent-driven "add a plugin" workflow: `/add-plugin` + `/vet-plugin` skills, a `plugin-onboarder`

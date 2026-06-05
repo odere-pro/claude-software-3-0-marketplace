@@ -23,5 +23,9 @@ fi
 tmp="$(mktemp)"
 jq --indent 2 --arg n "$name" 'del(.plugins[] | select(.name == $n))' "$manifest" >"$tmp"
 mv "$tmp" "$manifest"
-echo "removed \"$name\" from $MK_MANIFEST" >&2
+
+# Deterministic changelog bullet (roadmap P8): record the removal under [Unreleased] → Removed.
+mk_changelog_bullet "Removed" "Remove \`$name\` from the marketplace."
+
+echo "removed \"$name\" from $MK_MANIFEST (changelog updated)" >&2
 echo "$name"

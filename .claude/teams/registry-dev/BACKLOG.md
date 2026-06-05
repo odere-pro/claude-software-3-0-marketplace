@@ -77,20 +77,42 @@ defects found; nothing committed. Evidence per item:
 | P10 | G2 FAILs `"NOPE"`/`"GPL-3.0"`, passes `"MIT"`/`"MPL-2.0"`; allowlist named; expand-via-issue documented | PASS | G2 FAILed on `NOPE` and `GPL-3.0`, passed on `MIT`/`MPL-2.0`; allowlist message names all seven ids and cites `docs/adding-plugins.md` |
 | P11 | WebFetch absent from onboarder tools; 404→plugin.json fallback; prompt-injection note | PASS | `plugin-onboarder.md` `tools:` = `Bash, Read, Grep, Glob` (no WebFetch); README-as-untrusted-data note present; gh-api fetch with `plugin.json` fallback documented |
 
-## Phase 1 (not in scope this run)
+## Phase 1 — operability core
 
 | ID | Item | Lane | Depends on | Acceptance (gate/check) | Status |
 | --- | --- | --- | --- | --- | --- |
-| P8 | Deterministic CHANGELOG bullet from scripts + distinct sync-gate `11-changelog-in-sync.sh` | A/B | Phase 0 | All three write scripts emit the bullet; gate FAILs when manifest plugin-set changed but Unreleased omits it | todo |
-| P13a | Skill `## Failure handling` rollback sections + gate `12-skill-failure-handling.sh` | B/A | Phase 0 | Gate FAILs any SKILL.md missing the section; rollback uses `git restore --staged … && git restore …` | todo |
-| P13b | Skill front-matter lint + agent argument-hint gate `13-skill-frontmatter.sh` | B/A | Phase 0 | Required fields FAIL if absent; `argument-hint` absence is WARN | todo |
-| P13c | Skill-script path-existence gate `14-skill-script-paths.sh` | A | Phase 0 | Every `bash .../scripts/<x>.sh` reference resolves; FAILs on non-existent path | todo |
-| P13d | DRY-source gate for the manage-plugins core (may fold into P5) | A | P5 | No `.sh` outside `add-plugin/scripts/` re-implements core helpers | todo |
-| P13e | Hook block-message citations + remediation hints | B | Phase 0 | Block output contains the gate/policy citation token; G6 green | todo |
-| P13f | Pre-submission contract checklist + candidate plugin.json `jq` validation block | D | Phase 0 | Checklist + `jq` one-liner present; G5 green; no hosted schema file | todo |
-| P13g | Submission onramp + README empty-state example + verify step | D | Phase 0 | G9 green; empty-state emitted by generator; speculative strings labeled | todo |
-| P13h | README License + Keywords columns (consolidated) | B | Phase 0 | G9 green; one `sync-readme.sh` extension renders both columns | todo |
-| P15 | Reproducible-diff check (NOT auto-merge) | C | Phase 0 | Re-running scripts reproduces post-format structural bytes + gates green; merge stays with CODEOWNERS (D7) | todo |
+| P8 | Deterministic CHANGELOG bullet from scripts + distinct sync-gate `11-changelog-in-sync.sh` | A/B | Phase 0 | All three write scripts emit the bullet; gate FAILs when manifest plugin-set changed but Unreleased omits it | done |
+| P13a | Skill `## Failure handling` rollback sections + gate `12-skill-failure-handling.sh` | B/A | Phase 0 | Gate FAILs any SKILL.md missing the section; rollback uses `git restore --staged … && git restore …` | done |
+| P13b | Skill front-matter lint + agent argument-hint gate `13-skill-frontmatter.sh` | B/A | Phase 0 | Required fields FAIL if absent; `argument-hint` absence is WARN | done |
+| P13c | Skill-script path-existence gate `14-skill-script-paths.sh` | A | Phase 0 | Every `bash .../scripts/<x>.sh` reference resolves; FAILs on non-existent path | done |
+| P13d | DRY-source gate for the manage-plugins core (folded into `00-harness-integrity.sh` per D11) | A | P5 | No `.sh` outside `add-plugin/scripts/` re-implements core helpers | done |
+| P13e | Hook block-message citations + remediation hints | B | Phase 0 | Block output contains the gate/policy citation token; G6 green | done |
+| P13f | Pre-submission contract checklist + candidate plugin.json `jq` validation block | D | Phase 0 | Checklist + `jq` one-liner present; G5 green; no hosted schema file | done |
+| P13g | Submission onramp + README empty-state example + verify step | D | Phase 0 | G9 green; empty-state emitted by generator; speculative strings labeled | done |
+| P13h | README License + Keywords columns (consolidated) | B | Phase 0 | G9 green; one `sync-readme.sh` extension renders both columns | done |
+| P15 | Reproducible-diff check (NOT auto-merge) | C | Phase 0 | Re-running scripts reproduces post-format structural bytes + gates green; merge stays with CODEOWNERS (D7) | done |
+
+### Phase 1 — acceptance record (PM sign-off 2026-06-06)
+
+All 10 Phase-1 items ACCEPTED. Each new gate was written test-first and proven to FAIL when its
+invariant is violated (negative-tested via safe temp-backup, then restored), and the manifest/hooks/CI
+surfaces were red-teamed. Final `bash tests/gates/run-all.sh` green (15 gates: G0/00–G14/14);
+`claude plugin validate .` clean (expected empty-registry warning only); all shell clean at
+`shellcheck -S error`. Central gate numbers kept exactly (11–14; P13d folded into 00; P15 lives at
+`.github/scripts/reproducible-diff.sh`, deliberately outside `run-all.sh`). Nothing committed.
+
+| ID | Roadmap acceptance criterion | Verdict | Evidence |
+| --- | --- | --- | --- |
+| P8 | Three write scripts emit a deterministic bullet; `11-changelog-in-sync.sh` FAILs when a listed plugin is omitted; rollback handles staged-vs-dirty | PASS | `mk_changelog_bullet` (shared `lib.sh`) wired into add/update/remove-entry.sh; G11 FAILed on an injected listed-but-unlisted plugin; rollback via P13a's `git restore --staged … && git restore …` (CHANGELOG.md in recipe) |
+| P13a | Gate FAILs any SKILL.md missing `## Failure handling`; write skills use `git restore --staged … && git restore …` | PASS | G12 FAILed on section deletion and on `--staged` removal; all 4 SKILL.md carry the section; 3 write skills document the staged+dirty rollback |
+| P13b | Required fields FAIL if absent; `argument-hint` absence is WARN | PASS | G13 FAILed when `allowed-tools` removed; emitted WARN (rc=0) when `argument-hint` removed; agent `plugin-onboarder.md` got an `argument-hint` |
+| P13c | Every skill-script reference resolves; FAILs on a non-existent path | PASS | G14 (10 refs) FAILed on an injected bogus `scripts/does-not-exist.sh`; portable (no `mapfile`, BSD/macOS-safe) |
+| P13d | No `.sh` outside `add-plugin/scripts/` re-implements `mk_normalize_repo`/`MK_OWNER`/`MK_MANIFEST` | PASS | Folded into `00-harness-integrity.sh` §6; FAILed on a forked def, did NOT trip on a comment-only mention (false-positive guard) |
+| P13e | Block output contains the gate/policy citation token; G6 green | PASS | `marketplace-guard` block cites `G2 / 02-marketplace-shape.sh`; `guard-commit-author` cites the human-authored policy; both exit 2; G6/G0 green |
+| P13f | Checklist + `jq` one-liner present; G5 green; no hosted schema file | PASS | Pre-submission checklist + working `jq -e` field-validator in `docs/adding-plugins.md`; no `*.schema.json` created; G5 green |
+| P13g | G9 green; empty-state emitted by generator; speculative strings labeled | PASS | Generator emits empty-state prose (G9 green); README illustrative table labeled `[speculative]`; submission onramp + verify step in CONTRIBUTING.md |
+| P13h | G9 green; one `sync-readme.sh` extension renders License + Keywords columns | PASS | 5-column table verified in sandbox (License from `.license`, Keywords joined with `—` fallback); empty-state path unchanged → G9 green |
+| P15 | Re-running reproduces post-format structural bytes (excl. description/keywords); gates green; merge stays CODEOWNERS | PASS | `.github/scripts/reproducible-diff.sh` (canonical `jq --indent 2`, matches `json-format.sh`) passes at N=0, FAILs on non-canonical bytes / bad owner / forbidden key; wired as a PR-only CI job; NOT in `run-all.sh`; not auto-merge (D7) |
 
 ## Phase 2 (not in scope this run)
 

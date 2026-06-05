@@ -20,3 +20,16 @@ jobs:
 
       - name: Run gate suite
         run: bash tests/gates/run-all.sh
+
+  reproducible-diff:
+    name: reproducible diff (manifest provenance)
+    # PR-scoped "green ⇒ machine-generated" check for the manifest's structural fields (roadmap P15).
+    # NOT auto-merge — CODEOWNERS still governs merge (D7). Network-free; jq is preinstalled on
+    # ubuntu-latest. Kept out of run-all.sh so it never enters the always-on push suite.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Verify the manifest's structural fields are machine-generated
+        run: bash .github/scripts/reproducible-diff.sh

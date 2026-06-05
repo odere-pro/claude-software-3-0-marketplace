@@ -18,6 +18,10 @@ block() {
   echo "[guard-commit-author] BLOCKED: $1" >&2
   echo "[guard-commit-author] Commits must be human-authored. Drop the --author override and any" >&2
   echo "[guard-commit-author] 'Co-Authored-By: Claude' / 'Generated with Claude Code' line, then re-run." >&2
+  # Cite the policy + its config source so the fix path is explicit (roadmap P13e).
+  echo "[guard-commit-author] policy: human-authored commits (includeCoAuthoredBy:false in" >&2
+  echo "[guard-commit-author]   .claude/settings.json; see CONTRIBUTING.md \"Commits\")." >&2
+  echo "[guard-commit-author] remediation: re-run the commit without the attribution override/trailer." >&2
   exit 2
 }
 

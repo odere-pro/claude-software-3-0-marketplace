@@ -14,6 +14,10 @@
 #   5. constant-parity   — the secret regex and the forbidden-key set are byte-identical between their
 #                          gate site and their hook site. They are duplicated by design (the two trees
 #                          must not `source` across each other, D1); this gate FAILs if they diverge.
+#   6. dry-core          — the manage-plugins core helpers (mk_normalize_repo / MK_OWNER / MK_MANIFEST)
+#                          are DEFINED only in the shared lib under add-plugin/scripts/. No other `.sh`
+#                          re-implements them — that would fork the deliberately-single core (roadmap
+#                          P13d, folded here per D11; the four skills share one core, Brief §3).
 set -euo pipefail
 # shellcheck source=lib.sh
 . "$(dirname -- "$0")/lib.sh"
@@ -98,6 +102,24 @@ hook_source_tuple="$(grep -oE "\('sha','commit'\)" "$HOOK" | head -1 || true)"
 for key in version sha commit; do
   grep -q "has(\"$key\")" "$SHAPE_GATE" || note "G2 ($SHAPE_GATE) no longer rejects forbidden key \"$key\""
 done
+
+# ── 6. dry-core (P13d/D11: the manage-plugins core is defined once, never forked) ─────────────────
+# The single legitimate home for these symbols is the shared lib the four skills source.
+CORE_LIB=".claude/skills/add-plugin/scripts/lib.sh"
+# Match DEFINITIONS only (assignment / function declaration), not mere mentions in comments or strings,
+# so documenting a symbol can never trip the gate (the parity check learned the same lesson).
+#   MK_OWNER= / MK_MANIFEST=   → variable assignment at start of a (optionally indented) line
+#   mk_normalize_repo()        → function declaration
+core_def_re='^[[:space:]]*(MK_OWNER=|MK_MANIFEST=|(function[[:space:]]+)?mk_normalize_repo[[:space:]]*\(\))'
+while IFS= read -r sh; do
+  [ -n "$sh" ] || continue
+  case "$sh" in
+    "$CORE_LIB") continue ;;  # the one allowed definition site
+  esac
+  if grep -nE "$core_def_re" "$sh" >/dev/null 2>&1; then
+    note "$sh re-implements a manage-plugins core symbol (mk_normalize_repo/MK_OWNER/MK_MANIFEST) — these are defined only in $CORE_LIB (DRY, D11/P13d)"
+  fi
+done < <(find tests .claude -type f -name '*.sh')
 
 if [ "$fail" -ne 0 ]; then
   echo "G0 harness-integrity: FAIL"

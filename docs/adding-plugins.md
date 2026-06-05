@@ -43,6 +43,29 @@ plugin's own `plugin.json` is the version of record) and **no `sha`/`commit`** (
 default branch). The entry `name` may differ from the repo basename — e.g. `plugin-cookbook` lives in
 `odere-pro/claude-plugin-cookbook`.
 
+## Pre-submission checklist (candidate repo)
+
+Before `/add-plugin`, confirm the candidate repo satisfies the contract. The vet runs all of this
+automatically, but you can self-check first:
+
+- [ ] The repo is **`odere-pro`-owned** and is a plugin (ships `.claude-plugin/plugin.json`).
+- [ ] `plugin.json` has a non-empty **`name`**, **`description`**, and an SPDX **`license`** in the
+      allowlist (`MIT Apache-2.0 BSD-2-Clause BSD-3-Clause ISC 0BSD MPL-2.0`).
+- [ ] The repo ships **no `.claude-plugin/marketplace.json`** of its own (it would shadow this registry).
+- [ ] `description` is ≥ 20 characters and is not just the `name`; `keywords` lists ≥ 1 term;
+      `homepage` (if set) starts with `https://`.
+
+Validate the candidate's `plugin.json` shape locally with one `jq` line (no schema file is hosted
+here — the SPDX allowlist and field rules live in `vet-candidate.sh` + `02-marketplace-shape.sh`, so
+there is nothing to version-drift):
+
+```bash
+gh api repos/<owner>/<repo>/contents/.claude-plugin/plugin.json --jq '.content' | base64 -d \
+  | jq -e 'has("name") and has("description") and has("license")
+           and (.name|length>0) and (.description|length>=20) and (.license|length>0)' \
+  && echo "plugin.json has the required fields" || echo "plugin.json is missing a required field"
+```
+
 ## How it works (the pieces)
 
 | Piece | Role |

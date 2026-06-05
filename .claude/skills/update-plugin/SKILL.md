@@ -42,3 +42,19 @@ plugin's `plugin.json`), **replace/repoint** (`--repo <owner/repo>`), and **rena
 - The entry must already exist (this never adds). odere-pro repos only; never edits the plugin's repo.
 - Touches only `.claude-plugin/marketplace.json`, `README.md`, `CHANGELOG.md`; never sets
   `version`/`sha`/`commit`.
+
+## Failure handling
+
+If any step fails (the target is blocked on re-vet, a gate goes red, `claude plugin validate` errors,
+or the PR push fails), **stop and roll back** so the working tree is left exactly as it started —
+never half applied. Undo both the staged and the working-tree state of the three files this skill
+touches:
+
+```bash
+git restore --staged .claude-plugin/marketplace.json README.md CHANGELOG.md
+git restore .claude-plugin/marketplace.json README.md CHANGELOG.md
+```
+
+`git restore --staged …` first unstages anything `git add`ed in step 6; the second `git restore …`
+discards the working-tree edits from steps 3–4. Then report what failed and what you reverted. Do not
+commit or push a partial change.

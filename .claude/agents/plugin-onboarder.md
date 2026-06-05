@@ -7,6 +7,7 @@ description: >-
   never edits the manifest. Used by the /add-plugin and /vet-plugin skills; not for end users.
 tools: Bash, Read, Grep, Glob
 model: sonnet
+argument-hint: "<repo|owner/repo> + mode: add | update"
 ---
 
 You onboard one candidate plugin into the `odere-pro` marketplace. You do **not** edit any file — you

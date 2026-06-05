@@ -36,6 +36,16 @@ No plugins are listed yet (see the table below). Once a plugin is listed, instal
 _No plugins listed yet — add one with `/add-plugin <repo>` (see [docs/adding-plugins.md](docs/adding-plugins.md))._
 <!-- END PLUGINS -->
 
+The table above is empty today. Once `/add-plugin` lists a plugin, the generator renders one row per
+entry with **License** and **Keywords** columns sourced from the manifest. Expected shape
+(illustrative `[speculative]` — not a real listing):
+
+```text
+| Plugin | Repo | What it does | License | Keywords |
+| --- | --- | --- | --- | --- |
+| `<name>` | [odere-pro/<repo>](https://github.com/odere-pro/<repo>) | <one-line description> | MIT | `kw-a`, `kw-b` |
+```
+
 ## How it's wired
 
 This repo is a **dedicated aggregator**: it ships only `.claude-plugin/marketplace.json` and no plugin

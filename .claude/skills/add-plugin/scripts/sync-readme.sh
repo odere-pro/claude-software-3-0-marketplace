@@ -33,11 +33,16 @@ blockfile="$(mktemp)"
   if [ "$(jq '.plugins | length' "$manifest")" -eq 0 ]; then
     printf '_No plugins listed yet — add one with `/add-plugin <repo>` (see [docs/adding-plugins.md](docs/adding-plugins.md))._\n'
   else
-    printf '| Plugin | Repo | What it does |\n'
-    printf '| --- | --- | --- |\n'
+    printf '| Plugin | Repo | What it does | License | Keywords |\n'
+    printf '| --- | --- | --- | --- | --- |\n'
+    # License and Keywords columns are rendered straight from the manifest (roadmap P13h): License is
+    # the entry `.license`; Keywords joins `.keywords` with ", ". Both stay in sync with the manifest
+    # because this generator is the single source for the table (G9 checks byte-equality).
     jq -r '
       .plugins[]
-      | "| `\(.name)` | [\(.source.repo)](https://github.com/\(.source.repo)) | \(.description | gsub("\n"; " ")) |"
+      | "| `\(.name)` | [\(.source.repo)](https://github.com/\(.source.repo)) | "
+        + "\(.description | gsub("\n"; " ")) | \(.license // "—") | "
+        + "\((.keywords // []) | map("`" + . + "`") | join(", ") | if . == "" then "—" else . end) |"
     ' "$manifest"
   fi
   printf '%s\n' "$end"

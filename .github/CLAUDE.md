@@ -12,6 +12,14 @@ Author-only. Continuous integration and the supply-chain hardening for the regis
 - **`codeql.yml`** — CodeQL SAST over `languages: actions` (scans the workflow YAML itself; there is
   no compiled language here). Also **dormant** until public, for the same reason.
 
+The `ci.yml` `reproducible-diff` job (PR-only) runs `scripts/reproducible-diff.sh` (roadmap P15): a
+network-free "green ⇒ machine-generated" check that the manifest's **structural** fields
+(`source`/`license`/`homepage`, in canonical `jq --indent 2` form — the same formatter
+`.claude/hooks/json-format.sh` uses) reproduce the script-emitted shape. It **excludes** the
+LLM-curated `description`/`keywords` and is **not** auto-merge — CODEOWNERS still governs merge (D7).
+It lives under `scripts/` (not `tests/gates/`) so it never enters the always-on push suite
+`run-all.sh`.
+
 ## Supply chain
 
 - **All actions are pinned by full commit SHA** with a trailing `# vX.Y.Z` comment — an OpenSSF

@@ -19,6 +19,25 @@ It vets the candidate, inserts a well-formed entry, regenerates the README table
 changelog, runs the gates, and opens the PR for you. The full process, the listability contract, and
 how to clear each blocker are in [`docs/adding-plugins.md`](docs/adding-plugins.md).
 
+### Submission onramp (the short version)
+
+1. **Preflight.** `/vet-plugin <repo>` — read-only go/no-go. Clear any blocker it reports (the most
+   common one: the candidate still ships its own `.claude-plugin/marketplace.json`).
+2. **List it.** `/add-plugin <repo>` — vets, edits the manifest, regenerates the README table (now
+   with **License** and **Keywords** columns), appends a deterministic `CHANGELOG.md` bullet, runs the
+   gates, and opens a PR.
+3. **Verify before the PR merges** (the add flow runs this for you; run it yourself for the manual
+   path):
+
+   ```bash
+   bash .claude/skills/add-plugin/scripts/sync-readme.sh   # regenerate the README table
+   bash tests/gates/run-all.sh                             # authoritative check (CI runs this)
+   claude plugin validate . --strict                       # meaningful once the registry is non-empty
+   ```
+
+   `run-all.sh` must be green — including `09-readme-in-sync` (table matches the manifest) and
+   `11-changelog-in-sync` (every listed plugin is named in the changelog).
+
 **Requirements for a candidate** (also enforced by `tests/gates/02-marketplace-shape.sh`):
 
 - The plugin lives in its **own** `odere-pro` repo with a valid `.claude-plugin/plugin.json`
