@@ -45,9 +45,10 @@ manual fallback: [`docs/adding-plugins.md`](docs/adding-plugins.md),
 
 ## Gate map
 
-`bash tests/gates/run-all.sh` before any PR (CI runs the same). G1 json-parses · G2 marketplace-shape
-· G3 no-absolute-paths · G4 secret-scan · G5 doc-links · G6 shellcheck · G7 claude-md-coverage ·
-G8 markdown-lint (advisory) · G9 readme-in-sync. See [`tests/gates/CLAUDE.md`](tests/gates/CLAUDE.md).
+`bash tests/gates/run-all.sh` before any PR (CI runs the same). G0 harness-integrity · G1 json-parses
+· G2 marketplace-shape · G3 no-absolute-paths · G4 secret-scan · G5 doc-links · G6 shellcheck ·
+G7 claude-md-coverage · G8 markdown-lint (advisory) · G9 readme-in-sync · G10 vet-verdict-schema.
+See [`tests/gates/CLAUDE.md`](tests/gates/CLAUDE.md).
 
 ## Verify before commit
 

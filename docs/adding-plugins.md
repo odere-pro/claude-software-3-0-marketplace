@@ -31,6 +31,12 @@ A candidate is ready when **all** of these hold (enforced by
   name `odere-pro` silently shadows this registry — the collision that broke installs before. The
   plugin must be plugin-only.
 - **It isn't already listed** here.
+- **The listing meets the quality floors** (G2 enforces these on every entry): `description` is
+  non-empty, at least 20 characters, and is not just a repeat of the entry `name`; `keywords` lists at
+  least one term; and `homepage` (when present) starts with `https://`. These keep each listing
+  useful for discovery rather than a bare stub. The generic-keyword denylist
+  (e.g. `claude-code`, `plugin`) is **advisory** — `plugin-onboarder` drops generic noise during
+  curation, but a generic keyword does not by itself block a listing.
 
 The entry written into `marketplace.json` is always a `github` source with **no `version`** (the
 plugin's own `plugin.json` is the version of record) and **no `sha`/`commit`** (installs track the
