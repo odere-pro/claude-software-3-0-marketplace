@@ -19,6 +19,22 @@ Author-only. Continuous integration and the supply-chain hardening for the regis
   upload need a **public** repo. Uncomment them when the repo goes public.
 - **`codeql.yml`** — CodeQL SAST over `languages: actions` (scans the workflow YAML itself; there is
   no compiled language here). Also **dormant** until public, for the same reason.
+- **`audit.yml`** — the consolidated cross-repo provenance audit (roadmap P4, Phase 3). **Scheduled**
+  (weekly cron) + `workflow_dispatch`. It re-derives, live, for every plugin listed in
+  `marketplace.json`: the repo exists and its `plugin.json` is fetchable/valid, `source.repo` matches
+  `odere-pro/<repo>`, and the listed repo ships no `marketplace.json` of its own (it does **not**
+  compare `entry.name` to `plugin.json.name` — the entry name may differ via `--name`, D13). It
+  **reuses the `vet-candidate.sh` probes** (DRY — no fork) via `scripts/audit-cross-repo.sh`. It is
+  **advisory / notify-only** (D3): it **never hard-FAILs**, **SKIPs** on any non-200/network/`gh`-auth
+  error (a connectivity control probe distinguishes a transient outage from real drift), and is a
+  **no-op while the registry is empty** (N=0). It is deliberately **not** a `tests/gates/` push-suite
+  gate — it makes network calls, which never enter `run-all.sh` (D3/D4). Auth is the default
+  `GITHUB_TOKEN` exported as `GH_TOKEN` (reads public plugin repos, no extra secret, D17/Q1). On
+  detected drift it opens or **updates one** tracking GitHub issue (keyed on a stable title) — the
+  notify channel (D17/Q1). Permissions are least-privilege: `contents: read` to read the checked-out
+  manifest/scripts plus `issues: write` for the notify — both narrow scopes G16 permits without an
+  allowlist entry (`issues: write`, like `security-events`/`id-token` `write`, is not the
+  high-blast-radius `contents: write`). The single `actions/checkout` is SHA-pinned (G15).
 
 The `ci.yml` `reproducible-diff` job (PR-only) runs `scripts/reproducible-diff.sh` (roadmap P15): a
 network-free "green ⇒ machine-generated" check that the manifest's **structural** fields
@@ -27,6 +43,11 @@ network-free "green ⇒ machine-generated" check that the manifest's **structura
 LLM-curated `description`/`keywords` and is **not** auto-merge — CODEOWNERS still governs merge (D7).
 It lives under `scripts/` (not `tests/gates/`) so it never enters the always-on push suite
 `run-all.sh`.
+
+The `audit.yml` job runs `scripts/audit-cross-repo.sh` (roadmap P4): the scheduled, advisory
+provenance re-derivation described above. Like `reproducible-diff.sh` it lives under `scripts/` (not
+`tests/gates/`) so it never enters the push suite — it makes network calls and is notify-only (D3).
+It drives `vet-candidate.sh` per listed entry rather than re-implementing the probes (DRY).
 
 ## Supply chain
 
