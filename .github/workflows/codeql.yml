@@ -4,18 +4,17 @@ name: codeql
 # so we analyze the `actions` language — CodeQL inspects the GitHub Actions workflows themselves for
 # security issues. Results upload to code-scanning and feed the OpenSSF Scorecard SAST check.
 #
-# DORMANT until this repo is PUBLIC: code-scanning upload requires a public repo (or GitHub Advanced
-# Security). Until then only the manual `workflow_dispatch` trigger is active. When the repo goes
-# public, uncomment the `push` / `pull_request` / `schedule` triggers below.
+# ACTIVE: this repo is PUBLIC (Q2/D16), so the code-scanning upload works. Runs on push/PR to `main`,
+# a weekly schedule, and manual `workflow_dispatch`.
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: ["main"]
-  # pull_request:
-  #   branches: ["main"]
-  # schedule:
-  #   - cron: "27 4 * * 1" # weekly, Monday 04:27 UTC
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  schedule:
+    - cron: "27 4 * * 1" # weekly, Monday 04:27 UTC
 
 permissions:
   contents: read

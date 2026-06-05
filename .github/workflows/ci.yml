@@ -27,10 +27,10 @@ jobs:
     name: gitleaks history scan
     # PR-scoped secret scan over the FULL git history (roadmap P-history-secret-scan, thesis 7/10).
     # Active now — the repo is public (Q2/D16). Shares P14's `fetch-depth: 0` checkout pattern so the
-    # whole history is present; gitleaks then FAILs the PR on any planted/committed secret. The action
-    # is SHA-pinned (G15). NOTE: gitleaks-action requires GITLEAKS_LICENSE for ORG-owned repos; set it
-    # as a repo secret (gitleaks.io). It runs only on pull_request, so it never enters the always-on
-    # push suite and never blocks a plain push.
+    # whole history is present; gitleaks then FAILs the PR on any planted/committed secret. Runs the
+    # license-free gitleaks CLI binary (pinned version + SHA-256 verified) instead of the gitleaks
+    # Action, which requires a paid GITLEAKS_LICENSE on org-owned repos. It runs only on pull_request,
+    # so it never enters the always-on push suite and never blocks a plain push.
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -38,11 +38,17 @@ jobs:
         with:
           fetch-depth: 0 # full history so gitleaks scans every commit, not just the PR tip
 
-      - name: Scan git history for secrets
-        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+      - name: Scan git history for secrets (gitleaks CLI, license-free)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }} # required for org-owned repos (gitleaks.io)
+          GITLEAKS_VERSION: "8.30.1"
+          GITLEAKS_SHA256: "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb"
+        run: |
+          set -euo pipefail
+          curl -fsSL -o gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          echo "${GITLEAKS_SHA256}  gitleaks.tar.gz" | sha256sum -c -
+          tar -xzf gitleaks.tar.gz gitleaks
+          ./gitleaks git . --redact --no-banner --exit-code 1
 
   reproducible-diff:
     name: reproducible diff (manifest provenance)

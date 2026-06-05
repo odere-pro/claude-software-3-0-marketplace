@@ -8,17 +8,19 @@ Author-only. Continuous integration and the supply-chain hardening for the regis
   `bash tests/gates/run-all.sh`. This is the gate that must stay green. The checkout uses
   `fetch-depth: 0` (full history) so the commit-author backstop gate `17-commit-author.sh` can scan
   every commit (roadmap P14/D15). It also carries two PR-only jobs:
-  - **`history-secret-scan`** — runs `gitleaks/gitleaks-action` (SHA-pinned) over the full git
-    history to FAIL the PR on any committed secret (roadmap P-history-secret-scan; active now, the
-    repo is public, D16). It shares the same `fetch-depth: 0` checkout pattern. **Org note:**
-    gitleaks-action requires `GITLEAKS_LICENSE` for **org-owned** repos — set it as a repo secret
-    (gitleaks.io) or the action errors. It runs only on `pull_request`, so it never blocks a push.
+  - **`history-secret-scan`** — runs the **license-free `gitleaks` CLI binary** (pinned version,
+    SHA-256 verified before use) over the full git history to FAIL the PR on any committed secret
+    (roadmap P-history-secret-scan; active now, the repo is public, D16). It shares the same
+    `fetch-depth: 0` checkout pattern. The CLI is used instead of `gitleaks/gitleaks-action`, which
+    requires a paid `GITLEAKS_LICENSE` on **org-owned** repos. It runs only on `pull_request`, so it
+    never blocks a push.
   - **`reproducible-diff`** — see below.
-- **`scorecard.yml`** — OpenSSF Scorecard. **Dormant**: only `workflow_dispatch` is active; the
-  `schedule`/`push` triggers are commented out because the public Scorecard API + code-scanning
-  upload need a **public** repo. Uncomment them when the repo goes public.
+- **`scorecard.yml`** — OpenSSF Scorecard. **Active** (the repo is public, D16): weekly `schedule`,
+  push to `main`, `branch_protection_rule`, and manual `workflow_dispatch`. Publishes the score to the
+  public Scorecard API and uploads SARIF to code-scanning.
 - **`codeql.yml`** — CodeQL SAST over `languages: actions` (scans the workflow YAML itself; there is
-  no compiled language here). Also **dormant** until public, for the same reason.
+  no compiled language here). **Active** now the repo is public (D16): push/PR to `main`, a weekly
+  schedule, and manual `workflow_dispatch`.
 - **`audit.yml`** — the consolidated cross-repo provenance audit (roadmap P4, Phase 3). **Scheduled**
   (weekly cron) + `workflow_dispatch`. It re-derives, live, for every plugin listed in
   `marketplace.json`: the repo exists and its `plugin.json` is fetchable/valid, `source.repo` matches
