@@ -22,10 +22,11 @@ This repo has **no `plugin.json` and no plugin components** (`skills/`, `agents/
 | Path | Role | Detail |
 | ---- | ---- | ------ |
 | `.claude-plugin/` | the manifest (registry payload) | [`.claude-plugin/CLAUDE.md`](.claude-plugin/CLAUDE.md) |
-| `.claude/` | dev harness: settings, hooks, rules, the add-plugin skills + agent, statusline, MCP | [`.claude/CLAUDE.md`](.claude/CLAUDE.md) |
+| `.claude/` | dev harness: settings, hooks, rules, the add-plugin skills + agent, the `registry-dev` team, statusline, MCP | [`.claude/CLAUDE.md`](.claude/CLAUDE.md) |
+| `.claude/teams/` | author-only spawnable agent teams (the `registry-dev` engineering team) | [`.claude/teams/CLAUDE.md`](.claude/teams/CLAUDE.md) |
 | `.github/` | CI, supply-chain workflows, Dependabot, CODEOWNERS | [`.github/CLAUDE.md`](.github/CLAUDE.md) |
 | `tests/gates/` | the validation gate suite | [`tests/gates/CLAUDE.md`](tests/gates/CLAUDE.md) |
-| `docs/` | human-readable references (adding plugins) | [`docs/CLAUDE.md`](docs/CLAUDE.md) |
+| `docs/` | human-readable references (adding plugins; the dev teams + roadmaps) | [`docs/CLAUDE.md`](docs/CLAUDE.md) |
 | root docs | `SOFTWARE-3-0.md`, `CONTRIBUTING.md`, `SECURITY.md`, `SUPPORT.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md` | governance |
 | hygiene | `.editorconfig`, `.gitattributes`, `.markdownlint*.jsonc`, `.prettierrc`, `package.json` | repo config |
 

@@ -28,8 +28,16 @@ high-signal harness for a repo whose only payload is one JSON file.
     existing entry.
   - `remove-plugin/` — `/remove-plugin <name>`: drop an entry.
   See [`docs/adding-plugins.md`](../docs/adding-plugins.md).
-- **`agents/plugin-onboarder.md`** — read-only worker the skills delegate to: fetches + vets a candidate
-  repo and curates its description/keywords; never edits the manifest.
+- **`agents/`** — the spawnable worker + team agents:
+  - `plugin-onboarder.md` — read-only worker the skills delegate to: fetches + vets a candidate repo
+    and curates its description/keywords; never edits the manifest.
+  - `registry-dev-*.md` (9) — the `registry-dev` engineering team's roles (auto-discovered); see
+    `teams/` below.
+- **`teams/`** — author-only spawnable agent teams (dev-only; never shipped):
+  - `registry-dev/` — the engineering team that implements the brainstorm roadmap (`docs/plan/`)
+    behind the gate suite. `TEAM-BRIEF.md` + `BACKLOG.md` + `README.md`; entry point
+    `registry-dev-manager`. Its ideation counterpart is `docs/brainstorm/`; the handoff is
+    [`docs/teams.md`](../docs/teams.md).
 - **`rules/marketplace-dev.md`** — path-scoped (`.claude-plugin/**`) restatement of the manifest
   contract; loads only when the manifest is touched.
 - **`agentline.json`** — statusline (model · branch · PR · context% · tokens · cost) for the
