@@ -7,7 +7,7 @@ description: >-
   updates CHANGELOG, runs gates, opens a PR. Invoke explicitly as /update-plugin <name>. Edits files.
 disable-model-invocation: true
 model: sonnet
-argument-hint: "<name> [--repo <owner/repo>] [--name <new-name>]"
+argument-hint: "<name> [--repo <owner/repo>] [--name <new-name>] [--description \"…\"] [--keywords a,b,c]"
 allowed-tools: Read, Grep, Glob, Agent, Edit(.claude-plugin/marketplace.json), Edit(README.md), Edit(CHANGELOG.md), Bash(bash .claude/skills/add-plugin/scripts/vet-candidate.sh:*), Bash(bash .claude/skills/add-plugin/scripts/update-entry.sh:*), Bash(bash .claude/skills/add-plugin/scripts/sync-readme.sh:*), Bash(bash tests/gates/run-all.sh), Bash(claude plugin validate:*), Bash(git checkout:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(gh pr create:*)
 ---
 
@@ -26,7 +26,8 @@ plugin's `plugin.json`), **replace/repoint** (`--repo <owner/repo>`), and **rena
    repo (the `--repo` override, or the entry's current `source.repo`): it runs
    `vet-candidate.sh --skip-listed-check <repo>` and, if clean, returns a refreshed `description` /
    `keywords` proposal. If blocked (e.g. the target now ships its own `marketplace.json`, or the owner
-   isn't `odere-pro`), print the blockers and **stop**.
+   isn't `odere-pro`), print the blockers and **stop**. If `--description` or `--keywords` were
+   supplied by the caller, they override the subagent's values when passed to `update-entry.sh` in step 3.
 3. **Apply.** Run
    `bash .claude/skills/add-plugin/scripts/update-entry.sh <name> [--repo …] [--name …] [--description "…"] [--keywords a,b]`
    with the curated values. It re-vets and replaces the entry in place.

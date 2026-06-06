@@ -40,15 +40,23 @@ target_repo="${o_repo:-$cur_repo}"
 # Re-vet the target repo (skip the already-listed check — we're updating an existing entry).
 verdict="$(bash "$here/vet-candidate.sh" --skip-listed-check "$target_repo")" || {
   echo "BLOCKED — cannot update \"$name\":" >&2
-  printf '%s' "$verdict" | jq -r '.blockers[]? | "  - " + .' >&2 2>/dev/null || true
+  printf '%s' "$verdict" | jq -r '.blockers[]? | "  - " + .message + (if .fix then " (fix: " + .fix + ")" else "" end)' >&2
   exit 1
 }
 
 repo="$(printf '%s' "$verdict" | jq -r '.repo')"
+plugin_json_name="$(printf '%s' "$verdict" | jq -r '.name')"
 desc="$(printf '%s' "$verdict" | jq -r '.description')"
 home="$(printf '%s' "$verdict" | jq -r '.homepage')"
 lic="$(printf '%s' "$verdict" | jq -r '.license')"
 keywords_json="$(printf '%s' "$verdict" | jq -c '.keywords')"
+
+# When --repo repoints to a different repo, warn if that repo's plugin.json name differs from the
+# kept entry name. The entry keeps the caller-supplied (or existing) name — the warning signals that
+# the operator may want to also pass --name to align them (or intentionally diverge).
+if [ -n "$o_repo" ] && [ "$plugin_json_name" != "$name" ]; then
+  echo "WARNING: repointed repo's plugin.json name (\"$plugin_json_name\") differs from kept entry name (\"$name\"); pass --name \"$plugin_json_name\" to align them" >&2
+fi
 
 # Apply overrides.
 new_name="${o_name:-$name}"

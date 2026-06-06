@@ -87,12 +87,18 @@ while IFS= read -r entry; do
 
   # Keep only the contract blockers relevant to a provenance audit (D13 excludes name/component
   # advisories that are add-time quality floors, not provenance drift).
+  # Repo-posture blockers (REPO_ARCHIVED, REPO_PRIVATE, LICENSE_FILE_MISMATCH) are included here
+  # because a listed repo that has since gone archived/private or whose license has diverged is
+  # genuine post-listing drift, not merely an add-time quality floor.
   relevant="$(printf '%s' "$verdict" | jq -c '
     [ (.blockers // [])[]
       | select(.code == "PLUGIN_JSON_UNREADABLE"
             or .code == "PLUGIN_JSON_INVALID"
             or .code == "SHIPS_MARKETPLACE_JSON"
-            or .code == "OWNER_NOT_ALLOWED")
+            or .code == "OWNER_NOT_ALLOWED"
+            or .code == "REPO_ARCHIVED"
+            or .code == "REPO_PRIVATE"
+            or .code == "LICENSE_FILE_MISMATCH")
       | {code: .code, message: .message} ]' 2>/dev/null || echo '[]')"
 
   problems="$(printf '%s' "$problems" | jq --argjson r "$relevant" '. + $r')"

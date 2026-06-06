@@ -6,10 +6,12 @@
 #     what makes the name-collision class of bug possible, so we pin it here),
 #   - $schema is present and exactly the pinned schemastore URL (pure string-equality, no network),
 #   - owner.name + owner.email present,
+#   - top-level description is present, non-empty, and >= 40 chars,
 #   - every plugin entry is a `github` source whose repo is owned by odere-pro (the repo basename may
 #     differ from the entry name — e.g. plugin-cookbook lives in claude-plugin-cookbook),
 #   - entry names are unique,
 #   - every entry carries name + description + license,
+#   - every entry has >= 1 keyword NOT in the generic-keyword denylist (W2.1 / promoted advisory->FAIL),
 #   - every entry's `license` is one of the SPDX allowlist identifiers (roadmap P10 / D14),
 #   - NO entry sets `version` (each plugin's own plugin.json is the version of record),
 #   - NO entry or source sets `sha`/`commit` (installs track each plugin repo's default branch).
@@ -24,11 +26,18 @@ cd "$(gates_repo_root)"
 # cross-tree `source`). Expanding this set is an explicit "open an issue" change (docs/adding-plugins.md).
 SPDX_ALLOWLIST="MIT Apache-2.0 BSD-2-Clause BSD-3-Clause ISC 0BSD MPL-2.0"
 
+# Generic-keyword denylist (W2.1): promoted from advisory to FAIL.
+# Each entry must have at least one keyword NOT in this list. The list is kept byte-identical with
+# .claude/hooks/marketplace-guard.sh (Write-path structural mirror) via the parity check in
+# 00-harness-integrity.sh (§5). To extend the list, edit both sites and update G0's parity pair.
+KEYWORD_DENYLIST='claude plugin tool utility helper code ai assistant cli'
+
 MK="$GATES_MARKETPLACE"
 [ -f "$MK" ] || { echo "  FAIL: missing $MK"; echo "G2 marketplace-shape: FAIL"; exit 1; }
 jq empty "$MK" >/dev/null 2>&1 || { echo "  FAIL: $MK is not valid JSON"; echo "G2 marketplace-shape: FAIL"; exit 1; }
 
-problems="$(jq -r --argjson allow "$(printf '%s' "$SPDX_ALLOWLIST" | jq -R 'split(" ")')" '
+problems="$(jq -r --argjson allow "$(printf '%s' "$SPDX_ALLOWLIST" | jq -R 'split(" ")')" \
+            --argjson deny "$(printf '%s' "$KEYWORD_DENYLIST" | jq -R 'split(" ")')" '
   ( [ (if .name == "odere-pro" then empty else "top-level name must be \"odere-pro\" (got \(.name | tojson))" end),
       (if (."$schema" // "") == "https://json.schemastore.org/claude-code-marketplace.json"
          then empty
@@ -37,6 +46,7 @@ problems="$(jq -r --argjson allow "$(printf '%s' "$SPDX_ALLOWLIST" | jq -R 'spli
       (if (.owner.email // "") != "" then empty else "owner.email missing" end),
       (if (.plugins | type) == "array" then empty else "plugins must be an array (it may be empty — the registry can start with no plugins)" end),
       (if ((.description // "") | length) > 0 then empty else "top-level description is empty (the marketplace needs a one-line description)" end),
+      (if ((.description // "") | length) >= 40 then empty else "top-level description is too short (>= 40 chars required; the marketplace needs a meaningful one-liner)" end),
       ( ([.plugins[]?.name] | group_by(.) | map(select(length > 1)[0]) | unique[]?) as $dup
         | "duplicate plugin name \"\($dup)\" (entry names must be unique)" )
     ]
@@ -49,6 +59,7 @@ problems="$(jq -r --argjson allow "$(printf '%s' "$SPDX_ALLOWLIST" | jq -R 'spli
           (if (($p.description // "") | length) >= 20 then empty else "plugins[\($i)].description is too short (>= 20 chars; a listing needs a real one-liner)" end),
           (if (($p.description // "") | ascii_downcase) != (($p.name // "") | ascii_downcase) then empty else "plugins[\($i)].description must not just repeat the name" end),
           (if (($p.keywords // []) | length) > 0 then empty else "plugins[\($i)].keywords is empty (list at least one keyword for discoverability)" end),
+          (if (($p.keywords // []) | map(ascii_downcase) | map(. as $k | $deny | index($k) | . == null) | any) then empty else "plugins[\($i)].keywords contains only generic terms (\($deny | join(", "))): add at least one specific keyword" end),
           (if (($p.homepage // "") | test("^https://")) then empty else "plugins[\($i)].homepage must start with https:// (got \(($p.homepage // "") | tojson))" end),
           (if (($p.license // "") != "") then empty else "plugins[\($i)].license missing" end),
           (if (($p.license // "") == "") or ($allow | index($p.license)) then empty else "plugins[\($i)].license \(($p.license) | tojson) is not in the SPDX allowlist (MIT Apache-2.0 BSD-2-Clause BSD-3-Clause ISC 0BSD MPL-2.0); open an issue to expand it, see docs/adding-plugins.md" end),

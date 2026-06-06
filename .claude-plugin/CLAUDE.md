@@ -37,8 +37,10 @@ this is a registry, not a plugin.
 - **Each entry carries** `name`, `description`, `license` (plus `homepage`, `keywords` by convention).
 - **Listing-quality floors (G2):** `description` is non-empty, ≥ 20 chars, and not a verbatim repeat of
   `name`; `keywords` is non-empty; `homepage` (when set) matches `^https://`. The top-level
-  marketplace `description` is also non-empty. A generic-keyword denylist stays **advisory** (curation
-  drops noise like `claude-code`/`plugin`; it does not block).
+  marketplace `description` is also non-empty and **≥ 40 chars** (W2.1). **Each entry must have at
+  least one keyword NOT in the generic-keyword denylist** (`claude plugin tool utility helper code ai
+  assistant cli`) — this is a hard FAIL, not advisory (W2.1). The denylist is parity-gated between G2
+  and the Write-path hook (`marketplace-guard.sh`) via G0 §5.
 - **`$schema` is pinned** to `https://json.schemastore.org/claude-code-marketplace.json` (exact
   string-equality, checked by G2 with no network call).
 - **No `version`** on any entry — the plugin's own `plugin.json` is the version of record.

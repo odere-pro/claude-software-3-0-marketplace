@@ -31,6 +31,35 @@ mk_normalize_repo() {
 # shellcheck disable=SC2034
 MK_CHANGELOG="CHANGELOG.md"
 
+# Project marketplace.json plugin entries into a normalized NDJSON stream (one compact JSON object
+# per line). Both sync-readme.sh and sync-site.sh consume this so the per-entry field normalization
+# lives in ONE place (W2.3 DRY extraction). No network, no side effects, deterministic output order
+# (manifest order preserved).
+#
+# Output fields per entry (all strings, all guaranteed non-null):
+#   name        — entry name  (.name)
+#   repo        — owner/repo  (.source.repo)
+#   description — description (.description), newlines collapsed to spaces
+#   homepage    — canonical URL (.homepage, fallback: "https://github.com/<repo>")
+#   license     — SPDX id    (.license, fallback: "—")
+#   keywords    — array       (.keywords // [])
+#
+# Usage: mk_each_plugin_ndjson <manifest-path>
+# Requires jq.
+mk_each_plugin_ndjson() {
+  jq -c '
+    .plugins[] |
+    {
+      name:        .name,
+      repo:        .source.repo,
+      description: (.description | gsub("\n"; " ")),
+      homepage:    (.homepage // ("https://github.com/" + .source.repo)),
+      license:     (.license // "—"),
+      keywords:    (.keywords // [])
+    }
+  ' "$1"
+}
+
 # Insert a deterministic bullet into CHANGELOG.md under `## [Unreleased]` → `### <section>`, creating
 # the subsection if it is absent. This removes the "remember to hand-write a changelog line" step from
 # the agent flow (roadmap P8): the add/update/remove scripts each call this so the changelog tracks the

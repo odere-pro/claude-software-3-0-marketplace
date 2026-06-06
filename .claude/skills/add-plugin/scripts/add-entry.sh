@@ -30,7 +30,7 @@ manifest="$root/$MK_MANIFEST"
 # Vet first. Capture the verdict; abort with its blockers if not ok.
 verdict="$(bash "$here/vet-candidate.sh" "$REPO_ARG")" || {
   echo "BLOCKED — cannot add $REPO_ARG:" >&2
-  printf '%s' "$verdict" | jq -r '.blockers[]? | "  - " + .' >&2 2>/dev/null || true
+  printf '%s' "$verdict" | jq -r '.blockers[]? | "  - " + .message + (if .fix then " (fix: " + .fix + ")" else "" end)' >&2
   exit 1
 }
 

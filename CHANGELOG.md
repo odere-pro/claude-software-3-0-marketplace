@@ -8,6 +8,9 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
 ## [Unreleased]
 
 ### Added
+- List `claude-calibration` (`odere-pro/claude-calibration`).
+- List `claude-wiki-pages` (`odere-pro/claude-wiki-pages-plugin`).
+- List `claude-oop-excellence` (`odere-pro/claude-oop-excellence`).
 
 - Operability-core gates: `11-changelog-in-sync` (every listed plugin named in the changelog),
   `12-skill-failure-handling` (each `SKILL.md` documents rollback), `13-skill-frontmatter` (required

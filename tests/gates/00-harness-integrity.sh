@@ -8,7 +8,7 @@
 #                          so run-all.sh's discovery glob can never silently skip a misnamed gate (D8).
 #   2. gate-coverage     — the discovery glob actually matches the gate files on disk (no zero-match).
 #   3. surface-budget    — the harness keeps its fixed surface: exactly the 10 allow-listed agents,
-#                          4 skills, 3 hooks. A new surface is a regression to justify, not a default.
+#                          5 skills, 3 hooks. A new surface is a regression to justify, not a default.
 #   4. ship-surface      — the repo root ships NO plugin payload (plugin.json / skills/ / agents/ /
 #                          hooks/ / commands/). This repo is a registry, not a plugin.
 #   5. constant-parity   — the secret regex and the forbidden-key set are byte-identical between their
@@ -67,7 +67,7 @@ if [ "$actual_agents" != "$(printf '%s' "$EXPECTED_AGENTS" | sort)" ]; then
 fi
 
 n_skills="$(find .claude/skills -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')"
-[ "$n_skills" = "4" ] || note "skill surface is $n_skills, expected 4 (add/vet/update/remove-plugin)"
+[ "$n_skills" = "5" ] || note "skill surface is $n_skills, expected 5 (add/vet/update/remove/list-plugin)"
 
 n_hooks="$(find .claude/hooks -maxdepth 1 -name '*.sh' | wc -l | tr -d ' ')"
 [ "$n_hooks" = "3" ] || note "hook surface is $n_hooks, expected 3 (marketplace-guard, guard-commit-author, json-format)"
@@ -103,6 +103,17 @@ for key in version sha commit; do
   grep -q "has(\"$key\")" "$SHAPE_GATE" || note "G2 ($SHAPE_GATE) no longer rejects forbidden key \"$key\""
 done
 
+# Generic-keyword denylist (W2.1): the single-quoted denylist value must be byte-identical between
+# G2 (KEYWORD_DENYLIST=) and the hook (KEYWORD_DENYLIST=). Pattern: assignment on its own line,
+# value in single quotes — same shape as the secret regex parity check above.
+gate_denylist="$(grep -E "^KEYWORD_DENYLIST=" "$SHAPE_GATE" | sed -E "s/^KEYWORD_DENYLIST='(.*)'\$/\1/" || true)"
+hook_denylist="$(grep -E "^KEYWORD_DENYLIST=" "$HOOK" | sed -E "s/^KEYWORD_DENYLIST='(.*)'\$/\1/" || true)"
+if [ -z "$gate_denylist" ] || [ -z "$hook_denylist" ]; then
+  note "could not extract KEYWORD_DENYLIST from $SHAPE_GATE and/or $HOOK (assignment shape changed?)"
+elif [ "$gate_denylist" != "$hook_denylist" ]; then
+  note "KEYWORD_DENYLIST diverged between $SHAPE_GATE and $HOOK (must be byte-identical — W2.1/D1)"
+fi
+
 # ── 6. dry-core (P13d/D11: the manage-plugins core is defined once, never forked) ─────────────────
 # The single legitimate home for these symbols is the shared lib the four skills source.
 CORE_LIB=".claude/skills/add-plugin/scripts/lib.sh"
@@ -110,16 +121,34 @@ CORE_LIB=".claude/skills/add-plugin/scripts/lib.sh"
 # so documenting a symbol can never trip the gate (the parity check learned the same lesson).
 #   MK_OWNER= / MK_MANIFEST=   → variable assignment at start of a (optionally indented) line
 #   mk_normalize_repo()        → function declaration
-core_def_re='^[[:space:]]*(MK_OWNER=|MK_MANIFEST=|(function[[:space:]]+)?mk_normalize_repo[[:space:]]*\(\))'
+#   mk_each_plugin_ndjson()    → shared projection helper (W2.3: both sync generators consume this)
+core_def_re='^[[:space:]]*(MK_OWNER=|MK_MANIFEST=|(function[[:space:]]+)?(mk_normalize_repo|mk_each_plugin_ndjson)[[:space:]]*\(\))'
 while IFS= read -r sh; do
   [ -n "$sh" ] || continue
   case "$sh" in
     "$CORE_LIB") continue ;;  # the one allowed definition site
   esac
   if grep -nE "$core_def_re" "$sh" >/dev/null 2>&1; then
-    note "$sh re-implements a manage-plugins core symbol (mk_normalize_repo/MK_OWNER/MK_MANIFEST) — these are defined only in $CORE_LIB (DRY, D11/P13d)"
+    note "$sh re-implements a manage-plugins core symbol (mk_normalize_repo/mk_each_plugin_ndjson/MK_OWNER/MK_MANIFEST) — these are defined only in $CORE_LIB (DRY, D11/P13d)"
   fi
 done < <(find tests .claude -type f -name '*.sh')
+
+# The shared projection helper (W2.3) must be present in the core lib.
+# Both sync-readme.sh and sync-site.sh must consume it, not fork their own field-extraction.
+grep -qE '^mk_each_plugin_ndjson\(\)' "$CORE_LIB" \
+  || note "$CORE_LIB: mk_each_plugin_ndjson() is not defined — the shared projection helper is required (W2.3)"
+# sync-readme.sh and sync-site.sh must NOT re-implement the per-entry normalization.
+# After the extraction the normalization only lives in lib.sh (mk_each_plugin_ndjson).
+SYNC_README=".claude/skills/add-plugin/scripts/sync-readme.sh"
+SYNC_SITE=".claude/skills/add-plugin/scripts/sync-site.sh"
+for f in "$SYNC_README" "$SYNC_SITE"; do
+  [ -f "$f" ] || continue
+  if grep -qF 'mk_each_plugin_ndjson' "$f"; then
+    : # consumes the shared helper — good
+  else
+    note "$f: does not call mk_each_plugin_ndjson — it must consume the shared projection helper (W2.3)"
+  fi
+done
 
 if [ "$fail" -ne 0 ]; then
   echo "G0 harness-integrity: FAIL"

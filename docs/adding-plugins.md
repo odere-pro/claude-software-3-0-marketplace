@@ -47,6 +47,81 @@ plugin's own `plugin.json` is the version of record) and **no `sha`/`commit`** (
 default branch). The entry `name` may differ from the repo basename — e.g. `plugin-cookbook` lives in
 `odere-pro/claude-plugin-cookbook`.
 
+## Listing quality guide
+
+The `plugin-onboarder` agent curates the `description` and `keywords` for every listing. This
+section makes those heuristics public so you can write quality metadata before running `/add-plugin`,
+and so the curation step is predictable rather than opaque.
+
+### Description
+
+A good listing description is **tight, accurate, and concrete** — one focused paragraph that tells a
+developer exactly what the plugin does and when to reach for it. The floors enforced by
+`tests/gates/02-marketplace-shape.sh` are a minimum, not a target: ≥ 20 characters and not a repeat of
+the entry name. Aim for 60–120 characters: enough to be specific, short enough to scan.
+
+**Voice and tone:**
+
+- State what the plugin *does*, not what it *is* ("Provides structured OOP review workflows" not "A
+  plugin for OOP").
+- Be concrete about the domain or task ("AWS architecture decisions", "calibration of LLM outputs",
+  "wiki-style page generation").
+- Omit marketing language: no "powerful", "comprehensive", "amazing", "best-in-class". These are
+  noise in a discovery surface.
+- Do not repeat the plugin name verbatim in the description — the name is shown alongside it.
+
+**Examples:**
+
+| Description | Verdict |
+| ----------- | ------- |
+| `"OOP excellence plugin for Claude Code."` | **Weak** — too short (36 chars), vague, repeats the name concept, no concrete task. |
+| `"Structured agents and skills for applying object-oriented design principles (SOLID, patterns, refactoring) during code review and generation."` | **Strong** — concrete domain, lists the actual techniques, scannable, no fluff. |
+| `"A plugin."` | **Fails G2** — below 20 characters and says nothing. |
+| `"Automated calibration workflows that align LLM response quality to a target rubric, using pairwise comparison agents and a feedback loop."` | **Strong** — describes the mechanism and the outcome, specific without being long. |
+
+### Keywords
+
+Keywords feed discovery and the future site's filter surface. The `plugin-onboarder` drops generic
+noise automatically, but well-chosen keywords in `plugin.json` reduce the curation step to
+pass-through.
+
+**Rules of thumb:**
+
+- Pick 3–6 keywords that are **specific to the plugin's domain**, not to the hosting platform.
+- **Always drop** (or never add): `claude-code`, `plugin`, `claude`, `ai`, `llm`, `tool`. These
+  describe every entry in the registry equally and add no signal.
+- Prefer **noun phrases** that a developer would search for: `code-review`, `oop`, `refactoring`,
+  `calibration`, `wiki`, `documentation-generator`.
+- Include the primary **technology or methodology** if it is non-obvious from the name:
+  `solid-principles`, `pairwise-comparison`, `markdown`.
+
+**Examples:**
+
+| Keywords | Verdict |
+| -------- | ------- |
+| `["claude-code", "plugin", "ai"]` | **Weak** — all generic; a developer filtering by these gets the entire registry. Onboarder drops all three and falls back to the name. |
+| `["oop", "solid-principles", "code-review", "refactoring", "design-patterns"]` | **Strong** — specific to the domain; each term independently narrows the candidate set. |
+| `["calibration"]` | **Acceptable** — meets the ≥ 1 term floor; could be strengthened with `["calibration", "llm-alignment", "rubric", "pairwise-comparison"]`. |
+| `["wiki", "documentation-generator", "markdown", "page-builder"]` | **Strong** — four distinct, non-overlapping domain terms. |
+
+### Overriding curation at add/update time
+
+If the candidate's `plugin.json` carries suboptimal metadata, you can pass curated values directly
+when invoking the skills — the scripts forward them to `add-entry.sh` / `update-entry.sh`:
+
+```bash
+/add-plugin claude-oop-excellence \
+  --description "Structured agents for applying SOLID and design patterns during code review." \
+  --keywords "oop,solid-principles,code-review,refactoring"
+
+/update-plugin claude-oop-excellence \
+  --description "Updated description." \
+  --keywords "oop,refactoring"
+```
+
+This bypasses the `plugin-onboarder` curation step for those fields and uses the supplied values
+directly. The quality floors in G2 (`tests/gates/02-marketplace-shape.sh`) still apply.
+
 ## Pre-submission checklist (candidate repo)
 
 Before `/add-plugin`, confirm the candidate repo satisfies the contract. The vet runs all of this

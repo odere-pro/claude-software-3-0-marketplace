@@ -5,6 +5,65 @@
     "name": "odere-pro",
     "email": "odere.pro@gmail.com"
   },
-  "description": "odere-pro's Claude Code plugins — a single marketplace that aggregates each plugin from its own repository, so every plugin installs individually as <plugin>@odere-pro.",
-  "plugins": []
+  "description": "Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope.",
+  "plugins": [
+    {
+      "name": "claude-oop-excellence",
+      "source": {
+        "source": "github",
+        "repo": "odere-pro/claude-oop-excellence"
+      },
+      "description": "Audits and refactors codebases for object-oriented design quality: parallel RISK + PATTERN analysis tracks, a 102-entity glossary (45 issues, 57 patterns), and gated fix/implement commands — language-agnostic.",
+      "homepage": "https://github.com/odere-pro/claude-oop-excellence",
+      "license": "MIT",
+      "keywords": [
+        "oop",
+        "object-oriented-design",
+        "solid",
+        "design-patterns",
+        "code-quality",
+        "refactoring",
+        "audit",
+        "language-agnostic"
+      ]
+    },
+    {
+      "name": "claude-wiki-pages",
+      "source": {
+        "source": "github",
+        "repo": "odere-pro/claude-wiki-pages-plugin"
+      },
+      "description": "Ships Karpathy's LLM Wiki as a four-layer, hook-enforced Claude Code agent stack with multi-agent orchestration for knowledge management in Obsidian vaults.",
+      "homepage": "https://github.com/odere-pro/claude-wiki-pages-plugin",
+      "license": "Apache-2.0",
+      "keywords": [
+        "obsidian",
+        "knowledge-management",
+        "llm-wiki",
+        "multi-agent",
+        "orchestration",
+        "rag",
+        "karpathy",
+        "markdown"
+      ]
+    },
+    {
+      "name": "claude-calibration",
+      "source": {
+        "source": "github",
+        "repo": "odere-pro/claude-calibration"
+      },
+      "description": "Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups (CLAUDE.md, rules, skills, hooks, MCP, plugins) with scoring rubrics and enforcement scaffolding for recurring findings.",
+      "homepage": "https://github.com/odere-pro/claude-calibration",
+      "license": "MIT",
+      "keywords": [
+        "calibration",
+        "evaluation",
+        "config-audit",
+        "harness",
+        "orchestration",
+        "claude-code-setup"
+      ]
+    }
+  ]
 }

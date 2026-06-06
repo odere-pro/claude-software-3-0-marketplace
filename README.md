@@ -11,8 +11,23 @@ aggregated here, so you add this marketplace once and install any plugin individ
 The marketplace `name` is **`odere-pro`** — installs are always `<plugin>@odere-pro`, regardless of
 this repo's name.
 
-> **Status:** the registry is starting **empty** — plugins are added one at a time (after testing) via
-> the [`/add-plugin`](#managing-plugins) workflow. The list below is the source of truth.
+## Why trust this registry
+
+Every plugin listing passes a **19-gate automated suite** (`bash tests/gates/run-all.sh`) on every
+push and PR: the manifest is linted for structural correctness (G2), secret-scanned (G4), checked for
+supply-chain hygiene — SHA-pinned actions (G15) and least-privilege workflow permissions (G16) — and
+each plugin's `plugin.json` is vetted for a valid SPDX license (G2) and at least one domain-specific
+keyword. The repo also runs [CodeQL](https://codeql.github.com/) and
+[OpenSSF Scorecard](https://securityscorecards.dev/) in CI.
+
+Installing this marketplace adds it to your Claude Code session once; from then on individual plugins
+install by name:
+
+- **In a Claude Code session** (recommended): `/plugin marketplace add odere-pro/claude-software-3-0-marketplace`
+- **From the shell**: `claude plugin marketplace add odere-pro/claude-software-3-0-marketplace`
+
+Browse the full listing with live search at
+**[odere-pro.github.io/claude-software-3-0-marketplace](https://odere-pro.github.io/claude-software-3-0-marketplace/)**.
 
 ## Add the marketplace
 
@@ -22,7 +37,7 @@ this repo's name.
 
 ## Install plugins
 
-No plugins are listed yet (see the table below). Once a plugin is listed, install it with:
+Once the marketplace is added, install any plugin individually:
 
 ```text
 /plugin install <plugin>@odere-pro
@@ -33,18 +48,16 @@ No plugins are listed yet (see the table below). Once a plugin is listed, instal
 <!-- The table below is generated from .claude-plugin/marketplace.json by
      .claude/skills/add-plugin/scripts/sync-readme.sh. Don't edit it by hand. -->
 <!-- BEGIN PLUGINS -->
-_No plugins listed yet — add one with `/add-plugin <repo>` (see [docs/adding-plugins.md](docs/adding-plugins.md))._
-<!-- END PLUGINS -->
-
-The table above is empty today. Once `/add-plugin` lists a plugin, the generator renders one row per
-entry with **License** and **Keywords** columns sourced from the manifest. Expected shape
-(illustrative `[speculative]` — not a real listing):
-
-```text
 | Plugin | Repo | What it does | License | Keywords |
 | --- | --- | --- | --- | --- |
-| `<name>` | [odere-pro/<repo>](https://github.com/odere-pro/<repo>) | <one-line description> | MIT | `kw-a`, `kw-b` |
-```
+| `claude-oop-excellence` | [odere-pro/claude-oop-excellence](https://github.com/odere-pro/claude-oop-excellence) | Audits and refactors codebases for object-oriented design quality: parallel RISK + PATTERN analysis tracks, a 102-entity glossary (45 issues, 57 patterns), and gated fix/implement commands — language-agnostic. | MIT | `oop`, `object-oriented-design`, `solid`, `design-patterns`, `code-quality`, `refactoring`, `audit`, `language-agnostic` |
+| `claude-wiki-pages` | [odere-pro/claude-wiki-pages-plugin](https://github.com/odere-pro/claude-wiki-pages-plugin) | Ships Karpathy's LLM Wiki as a four-layer, hook-enforced Claude Code agent stack with multi-agent orchestration for knowledge management in Obsidian vaults. | Apache-2.0 | `obsidian`, `knowledge-management`, `llm-wiki`, `multi-agent`, `orchestration`, `rag`, `karpathy`, `markdown` |
+| `claude-calibration` | [odere-pro/claude-calibration](https://github.com/odere-pro/claude-calibration) | Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups (CLAUDE.md, rules, skills, hooks, MCP, plugins) with scoring rubrics and enforcement scaffolding for recurring findings. | MIT | `calibration`, `evaluation`, `config-audit`, `harness`, `orchestration`, `claude-code-setup` |
+<!-- END PLUGINS -->
+
+The table above is generated from `.claude-plugin/marketplace.json` by `sync-readme.sh` and is the
+source of truth for what is currently listed. To add more plugins, use `/add-plugin <repo>` in a
+Claude Code session in this repo (see [docs/adding-plugins.md](docs/adding-plugins.md)).
 
 ## How it's wired
 
