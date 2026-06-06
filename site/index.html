@@ -513,6 +513,48 @@
           animation: none !important;
         }
       }
+
+      .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1.4rem;
+        align-items: center;
+      }
+
+      .filter-label {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--color-muted);
+        margin-right: 0.3rem;
+      }
+
+      .filter-btn {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-text);
+        background: var(--color-surface);
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        padding: 0.25rem 0.7rem;
+        cursor: pointer;
+        transition: background var(--ease) 150ms, color var(--ease) 150ms, border-color var(--ease) 150ms;
+      }
+
+      .filter-btn:hover {
+        border-color: var(--color-accent-line);
+        color: var(--color-accent);
+      }
+
+      .filter-btn[aria-pressed="true"] {
+        background: var(--color-accent-soft);
+        border-color: var(--color-accent-line);
+        color: var(--color-accent);
+      }
+
+      .card[hidden] {
+        display: none;
+      }
     </style>
   </head>
   <body>
@@ -567,8 +609,33 @@
         <p class="section-lead">
           Every plugin lives in its own repository and installs individually.
         </p>
+      <div class="filter-bar" role="group" aria-label="Filter plugins by keyword">
+        <span class="filter-label">Filter:</span>
+        <button class="filter-btn" type="button" data-kw="audit" aria-pressed="false">audit</button>
+        <button class="filter-btn" type="button" data-kw="calibration" aria-pressed="false">calibration</button>
+        <button class="filter-btn" type="button" data-kw="claude-code-setup" aria-pressed="false">claude-code-setup</button>
+        <button class="filter-btn" type="button" data-kw="code-quality" aria-pressed="false">code-quality</button>
+        <button class="filter-btn" type="button" data-kw="config-audit" aria-pressed="false">config-audit</button>
+        <button class="filter-btn" type="button" data-kw="design-patterns" aria-pressed="false">design-patterns</button>
+        <button class="filter-btn" type="button" data-kw="evaluation" aria-pressed="false">evaluation</button>
+        <button class="filter-btn" type="button" data-kw="harness" aria-pressed="false">harness</button>
+        <button class="filter-btn" type="button" data-kw="karpathy" aria-pressed="false">karpathy</button>
+        <button class="filter-btn" type="button" data-kw="knowledge-management" aria-pressed="false">knowledge-management</button>
+        <button class="filter-btn" type="button" data-kw="language-agnostic" aria-pressed="false">language-agnostic</button>
+        <button class="filter-btn" type="button" data-kw="llm-wiki" aria-pressed="false">llm-wiki</button>
+        <button class="filter-btn" type="button" data-kw="markdown" aria-pressed="false">markdown</button>
+        <button class="filter-btn" type="button" data-kw="multi-agent" aria-pressed="false">multi-agent</button>
+        <button class="filter-btn" type="button" data-kw="object-oriented-design" aria-pressed="false">object-oriented-design</button>
+        <button class="filter-btn" type="button" data-kw="obsidian" aria-pressed="false">obsidian</button>
+        <button class="filter-btn" type="button" data-kw="oop" aria-pressed="false">oop</button>
+        <button class="filter-btn" type="button" data-kw="orchestration" aria-pressed="false">orchestration</button>
+        <button class="filter-btn" type="button" data-kw="rag" aria-pressed="false">rag</button>
+        <button class="filter-btn" type="button" data-kw="refactoring" aria-pressed="false">refactoring</button>
+        <button class="filter-btn" type="button" data-kw="solid" aria-pressed="false">solid</button>
+        <button class="filter-btn filter-btn-all" type="button" data-kw="" aria-pressed="true">All</button>
+      </div>
         <div class="grid">
-        <article class="card">
+        <article class="card" data-keywords="oop object-oriented-design solid design-patterns code-quality refactoring audit language-agnostic">
           <h3><a href="https://github.com/odere-pro/claude-oop-excellence">claude-oop-excellence</a></h3>
           <p class="card-desc">Audits and refactors codebases for object-oriented design quality: parallel RISK + PATTERN analysis tracks, a 102-entity glossary (45 issues, 57 patterns), and gated fix/implement commands — language-agnostic.</p>
           <pre class="install-cmd"><code>/plugin install claude-oop-excellence@odere-pro</code></pre>
@@ -577,7 +644,7 @@
             <span class="keywords"><span class="chip">oop</span><span class="chip">object-oriented-design</span><span class="chip">solid</span><span class="chip">design-patterns</span><span class="chip">code-quality</span><span class="chip">refactoring</span><span class="chip">audit</span><span class="chip">language-agnostic</span></span>
           </div>
         </article>
-        <article class="card">
+        <article class="card" data-keywords="obsidian knowledge-management llm-wiki multi-agent orchestration rag karpathy markdown">
           <h3><a href="https://github.com/odere-pro/claude-wiki-pages-plugin">claude-wiki-pages</a></h3>
           <p class="card-desc">Ships Karpathy&#39;s LLM Wiki as a four-layer, hook-enforced Claude Code agent stack with multi-agent orchestration for knowledge management in Obsidian vaults.</p>
           <pre class="install-cmd"><code>/plugin install claude-wiki-pages@odere-pro</code></pre>
@@ -586,7 +653,7 @@
             <span class="keywords"><span class="chip">obsidian</span><span class="chip">knowledge-management</span><span class="chip">llm-wiki</span><span class="chip">multi-agent</span><span class="chip">orchestration</span><span class="chip">rag</span><span class="chip">karpathy</span><span class="chip">markdown</span></span>
           </div>
         </article>
-        <article class="card">
+        <article class="card" data-keywords="calibration evaluation config-audit harness orchestration claude-code-setup">
           <h3><a href="https://github.com/odere-pro/claude-calibration">claude-calibration</a></h3>
           <p class="card-desc">Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups (CLAUDE.md, rules, skills, hooks, MCP, plugins) with scoring rubrics and enforcement scaffolding for recurring findings.</p>
           <pre class="install-cmd"><code>/plugin install claude-calibration@odere-pro</code></pre>
@@ -606,5 +673,26 @@
       <a href="https://github.com/odere-pro/claude-software-3-0-marketplace/blob/main/SOFTWARE-3-0.md">Software 3.0</a>
       <a href="https://github.com/odere-pro/claude-software-3-0-marketplace/issues">Issues</a>
     </footer>
+    <script>
+      (function () {
+        var active = "";
+        document.querySelectorAll(".filter-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            active = btn.dataset.kw;
+            document.querySelectorAll(".filter-btn").forEach(function (b) {
+              b.setAttribute("aria-pressed", b.dataset.kw === active ? "true" : "false");
+            });
+            document.querySelectorAll(".grid .card").forEach(function (card) {
+              if (!active) {
+                card.hidden = false;
+              } else {
+                var kws = card.dataset.keywords ? card.dataset.keywords.split(" ") : [];
+                card.hidden = kws.indexOf(active) === -1;
+              }
+            });
+          });
+        });
+      })();
+    </script>
   </body>
 </html>

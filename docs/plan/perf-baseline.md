@@ -146,7 +146,42 @@ strengthening, Pages compound item with gate 18):
 | CI `gates` job | ≤ 90 s (same apt baseline; G18 adds <100 ms) |
 | N listed plugins | 3 (seeded) |
 
-## 4. `/add-plugin` token / turn budget (placeholder)
+## 4. Keyword-derived grouping — implemented (Phase-1 follow-on, 2026-06-06)
+
+The Pages site now carries an offline keyword filter computed purely from existing `keywords[]`
+in the generator (`sync-site.sh`). No manifest field was added (D6 preserved).
+
+**What shipped:**
+- Each `<article class="card">` emits a `data-keywords="..."` attribute (space-joined, HTML-escaped).
+- A `<div class="filter-bar">` toolbar above the grid renders one button per unique sorted keyword.
+- A 20-line inline `<script>` (no remote `src`) in the template handles click-to-filter via
+  `card.hidden` toggling.
+- CSS for `.filter-bar`, `.filter-btn`, `[aria-pressed=true]`, and `.card[hidden]` is injected
+  inline before `</style>`.
+- N=0 empty-state: all filter surfaces are suppressed (no toolbar, no script).
+
+**Constraints verified:**
+- No manifest field — grouping is a pure projection of `keywords[]` (D6).
+- Fully offline — inline `<script>` only; G18 group-2 (no-remote-fetch) still passes.
+- Every keyword string routed through `html_esc` in jq (G18 group-3 XSS check still passes).
+- Byte-deterministic — stable `unique|sort` order, no `date` (G18 group-1 byte-equality passes).
+- N=0 and single-keyword entries render cleanly.
+
+**G18 gate update:** The XSS check in group-3 was updated to strip all template-generated `<script>`
+blocks (both JSON-LD and the filter script) before checking for manifest-field injection — the
+behavioral coverage is preserved and the awk scoping of check 3c is now tighter (stops at the
+first `</script>` in the LD block, not at EOF).
+
+**Keep-cut items (unchanged — do not re-propose):**
+
+| Cut item | Reason |
+| --- | --- |
+| Manifest `categories` root field | Non-negotiable: D6 (no non-`$schema` root field) + VETO discoverability-5. The discoverability need is satisfied by the computed keyword-derived grouping above. Never a manifest field. |
+| JSON Feed (gen-feed.sh + feed.json + feed gate) | Non-negotiable: D6 (no second on-disk index) + VETO discoverability-4. Revisit trigger: a concrete external subscriber appears. |
+| Live trust badges on the Pages site | Non-negotiable: offline-site rule + VETO supply-chain-2. External `<img>/<script>` forbidden; G18 group-2 already fails by design. Never on the static page. |
+| External shadow-name search (platform-5) | Low leverage; collision prevention is already covered by design and by vet + audit-cross-repo.sh. Advisory audit.yml step only if operator requests monitoring. |
+
+## 5. `/add-plugin` token / turn budget (placeholder)
 
 The roadmap notes a token/latency budget for `/add-plugin` runs as a future measurement target. No
 live run has been performed against a real candidate in this session (the manifest is N=0). The

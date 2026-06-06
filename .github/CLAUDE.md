@@ -28,15 +28,30 @@ Author-only. Continuous integration and the supply-chain hardening for the regis
   compare `entry.name` to `plugin.json.name` — the entry name may differ via `--name`, D13). It
   **reuses the `vet-candidate.sh` probes** (DRY — no fork) via `scripts/audit-cross-repo.sh`. It is
   **advisory / notify-only** (D3): it **never hard-FAILs**, **SKIPs** on any non-200/network/`gh`-auth
-  error (a connectivity control probe distinguishes a transient outage from real drift), and is a
-  **no-op while the registry is empty** (N=0). It is deliberately **not** a `tests/gates/` push-suite
-  gate — it makes network calls, which never enter `run-all.sh` (D3/D4). Auth is the default
-  `GITHUB_TOKEN` exported as `GH_TOKEN` (reads public plugin repos, no extra secret, D17/Q1). On
-  detected drift it opens or **updates one** tracking GitHub issue (keyed on a stable title) — the
-  notify channel (D17/Q1). Permissions are least-privilege: `contents: read` to read the checked-out
-  manifest/scripts plus `issues: write` for the notify — both narrow scopes G16 permits without an
-  allowlist entry (`issues: write`, like `security-events`/`id-token` `write`, is not the
-  high-blast-radius `contents: write`). The single `actions/checkout` is SHA-pinned (G15).
+  error (a connectivity control probe distinguishes a transient outage from real drift). Per-entry
+  checks are a **no-op while the registry is empty** (N=0); the About/topics check runs
+  unconditionally after the connectivity control probe passes. It is deliberately **not** a
+  `tests/gates/` push-suite gate — it makes network calls, which never enter `run-all.sh` (D3/D4).
+  Auth is the default `GITHUB_TOKEN` exported as `GH_TOKEN` (reads public plugin repos, no extra
+  secret, D17/Q1). Two additional checks extend the per-entry loop and post-loop (Phase 3):
+  - **CHECK A — Install-coordinate validity (DRIFT-level):** `MISSING_NAME` is added to the
+    per-entry relevance filter in `audit-cross-repo.sh`. A blank `plugin.json.name` breaks
+    `<plugin>@odere-pro` install resolution (provenance drift). Source-fetchable is already covered
+    by `PLUGIN_JSON_UNREADABLE` — no new probe needed (ADR: MISSING_NAME crosses the D13 line for
+    coordinate-validity but stays excluded as an add-time quality floor at vet-time).
+  - **CHECK B — About/topics advisory (ADVISORY-level, registry repo only):** checks the
+    `odere-pro/claude-software-3-0-marketplace` repo for recommended discovery topics (`claude-code`,
+    `marketplace`, `claude-code-plugins`) and a non-empty About description. Findings go to
+    `"advisories"` in the report — **never counted as drift**, never escalate the drift issue.
+  Two notify channels: on **drift** (or drift + advisories) → opens/updates the provenance-drift
+  issue (`"cross-repo audit: provenance drift detected"`, advisories appended in its body). On
+  **advisory-only** (drift empty) → opens/updates a **separate** advisory issue
+  (`"cross-repo audit: discoverability advisory"`) so advisory notices never co-mingle with the
+  provenance-drift issue. The open-or-update idiom is identical across both channels. Permissions are
+  least-privilege: `contents: read` to read the checked-out manifest/scripts plus `issues: write` for
+  the notify — both narrow scopes G16 permits without an allowlist entry (`issues: write`, like
+  `security-events`/`id-token` `write`, is not the high-blast-radius `contents: write`). The single
+  `actions/checkout` is SHA-pinned (G15).
 
 The `ci.yml` `reproducible-diff` job (PR-only) runs `scripts/reproducible-diff.sh` (roadmap P15): a
 network-free "green ⇒ machine-generated" check that the manifest's **structural** fields

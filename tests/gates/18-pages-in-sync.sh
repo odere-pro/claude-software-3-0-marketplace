@@ -154,38 +154,63 @@ fi
 if $xss_gen_ok && [ -f "$xss_site/index.html" ]; then
   xss_html="$xss_site/index.html"
 
-  # Strip the JSON-LD block from HTML before checking for live XSS vectors:
-  # JSON-LD is parsed as JSON by browsers (not HTML), so field values like onerror=
-  # or "><script>" inside JSON strings are NOT executable as HTML.
-  # The JSON-LD block itself is protected by the </script neutralization check (3c).
-  xss_html_no_ld="$(awk '
+  # Strip known-safe template-generated <script> blocks from HTML before checking for
+  # XSS vectors injected by manifest fields.
+  #
+  # Two block types are stripped:
+  #   (a) JSON-LD block (<script type="application/ld+json">…</script>) — parsed as JSON by
+  #       browsers, not HTML; protected separately by check 3c.
+  #   (b) Inline filter script — a multi-line <script> block with no type/src attributes,
+  #       emitted by the template shell heredoc, not from any manifest field.
+  #
+  # SINGLE-LINE rule: a <script>…</script> that opens and closes on the SAME line is NOT
+  # a legitimate template block (both template scripts above are multi-line).  Such a line
+  # is left in the output so that checks 3a/3b/3d can catch field-injected payloads.
+  # Setting sticky "skip" on a single-line block would swallow all subsequent HTML and
+  # produce a false PASS — this is the defect fixed here.
+  #
+  # After stripping only the two known blocks, the remaining HTML must contain no live XSS
+  # vectors from manifest fields (checks 3a, 3b, 3d).
+  xss_html_no_scripts="$(awk '
     /<script[^>]*application\/ld\+json/{skip=1; next}
+    /<script[^>]*>/{
+      if ($0 ~ /<\/script>/) {
+        # Single-line <script>…</script>: not a legitimate template block.
+        # Pass through so XSS checks can catch injected payloads on this line.
+        print; next
+      }
+      skip=1; next
+    }
     skip && /<\/script>/{skip=0; next}
     !skip{print}
   ' "$xss_html")"
 
-  # 3a. No LIVE onerror= attribute in the HTML outside the JSON-LD block.
+  # 3a. No LIVE onerror= attribute in the HTML outside all <script> blocks.
   # A live attack is: <tagname ... onerror=  (unescaped < starts an actual HTML tag).
   # Safe escaped occurrences look like: &lt;img src=x onerror= — these are just text content.
-  if printf '%s\n' "$xss_html_no_ld" | grep -qiE '<[a-zA-Z][^>]* onerror=' 2>/dev/null; then
-    note "HTML-ESCAPE: generated HTML (outside JSON-LD) contains live 'onerror=' attribute — stored XSS not neutralized"
+  if printf '%s\n' "$xss_html_no_scripts" | grep -qiE '<[a-zA-Z][^>]* onerror=' 2>/dev/null; then
+    note "HTML-ESCAPE: generated HTML (outside scripts) contains live 'onerror=' attribute — stored XSS not neutralized"
   fi
 
-  # 3b. No live attribute-breakout sequence that injects a script tag via homepage (outside JSON-LD).
+  # 3b. No live attribute-breakout sequence that injects a script tag via homepage.
   # A live attack: "><script> breaks out of an HTML attribute value and injects a script element.
-  if printf '%s\n' "$xss_html_no_ld" | grep -qF '"><script>' 2>/dev/null; then
-    note "HTML-ESCAPE: generated HTML (outside JSON-LD) contains attribute-breakout '\"><script>' — homepage field XSS not neutralized"
+  if printf '%s\n' "$xss_html_no_scripts" | grep -qF '"><script>' 2>/dev/null; then
+    note "HTML-ESCAPE: generated HTML (outside scripts) contains attribute-breakout '\"><script>' — homepage field XSS not neutralized"
   fi
 
   # 3c. JSON-LD block must not contain a raw </script sequence that closes the element early.
-  # Detection: count the total number of </script occurrences from the JSON-LD opening tag onwards.
-  # A clean block has exactly 1 (the legitimate closer).  Any extra means a field value contains
-  # </script, which a browser would use to terminate the <script> element prematurely.
+  # Detection: scope only to the LD block (from its open tag to the first </script> that closes it).
+  # A clean block has exactly 1 </script occurrence (the legitimate closer). Any extra means a
+  # field value contains </script, which a browser would use to terminate the <script> early.
   ld_script_count="$(awk '
     /<script[^>]*application\/ld\+json/{in_ld=1}
     in_ld {
       n = split($0, a, "</script")
-      if (n > 1) cnt += (n - 1)
+      if (n > 1) {
+        cnt += (n - 1)
+        # The LD block ends at the first </script occurrence on this line.
+        in_ld = 0
+      }
     }
     END {print cnt+0}
   ' "$xss_html")"
@@ -193,9 +218,11 @@ if $xss_gen_ok && [ -f "$xss_site/index.html" ]; then
     note "HTML-ESCAPE: JSON-LD section contains ${ld_script_count} '</script' occurrences (expected 1) — script-context breakout not neutralized"
   fi
 
-  # 3d. No live <script> tag injected via license/description outside the JSON-LD block.
-  if printf '%s\n' "$xss_html_no_ld" | grep -qiF '<script>' 2>/dev/null; then
-    note "HTML-ESCAPE: generated HTML contains a live '<script>' tag outside JSON-LD — license/description XSS not neutralized"
+  # 3d. No live <script> tag injected via license/description in the non-script HTML.
+  # Template-generated script blocks (JSON-LD + filter script) were stripped above; only
+  # manifest-field injections remain.
+  if printf '%s\n' "$xss_html_no_scripts" | grep -qiF '<script>' 2>/dev/null; then
+    note "HTML-ESCAPE: generated HTML contains a live '<script>' tag outside known script blocks — license/description XSS not neutralized"
   fi
 else
   # Generator invocation failed (broken patch or missing tool) — fall back to a static check

@@ -7,10 +7,22 @@ name: cross-repo-audit
 # marketplace.json of its own (D13: it does NOT compare entry.name to plugin.json.name). It reuses the
 # vet-candidate.sh probes (DRY) via .github/scripts/audit-cross-repo.sh.
 #
+# Two additional checks (Phase 3 extension):
+#   CHECK A — Install-coordinate validity (DRIFT-level, per-entry): MISSING_NAME is added to the
+#     relevance filter in audit-cross-repo.sh. A blank plugin.json.name breaks `<plugin>@odere-pro`
+#     resolution (provenance drift). Source-fetchable is already covered by PLUGIN_JSON_UNREADABLE.
+#   CHECK B — About/topics advisory (ADVISORY-level, registry repo only): checks the odere-pro
+#     marketplace repo for recommended discovery topics and a non-empty About description. Findings
+#     go to a SEPARATE advisory issue channel (never counted as drift, never dominates the drift
+#     issue). If both drift and advisories are present, drift notify fires and advisories are
+#     appended in the drift issue body (one issue per run, not two).
+#
 # ADVISORY / notify-only (D3): it NEVER hard-FAILs and is NOT a tests/gates push-suite gate (no
-# network in run-all.sh, D3/D4). It SKIPs on any non-200 / network / gh-auth error and is a no-op
-# while the registry is empty (N=0). On detected drift it opens or updates ONE tracking GitHub issue
-# (D17/Q1) — the notify channel.
+# network in run-all.sh, D3/D4). It SKIPs on any non-200 / network / gh-auth error. Per-entry checks
+# are a no-op while the registry is empty (N=0); the About/topics check runs unconditionally after
+# the connectivity control probe passes. On detected drift it opens or updates ONE tracking GitHub
+# issue (D17/Q1). On advisory-only findings it opens or updates a SEPARATE advisory issue (distinct
+# title, distinct channel) so advisories never co-mingle with the provenance-drift issue.
 #
 # Auth (D17/Q1): the default GITHUB_TOKEN (no extra secret) reads the public plugin repos and files
 # the issue. Least privilege (G16): contents:read to read the checked-out manifest/scripts;
@@ -58,12 +70,43 @@ jobs:
           AUDIT_REPORT: ${{ steps.audit.outputs.report }}
         run: |
           title="cross-repo audit: provenance drift detected"
-          body="$(printf '%s' "$AUDIT_REPORT" \
+          # Build the drift section.
+          drift_body="$(printf '%s' "$AUDIT_REPORT" \
             | jq -r '"The scheduled cross-repo audit (.github/workflows/audit.yml) re-derived the\nlisted plugins and found provenance drift:\n\n" + (([.drift[] | "- **\(.name)** (`\(.repo)`):\n" + ([.problems[] | "  - `\(.code)` — \(.message)"] | join("\n"))] | join("\n"))) + "\n\nThis is an advisory notice (D3). Run `/update-plugin` or `/remove-plugin` to reconcile the\nmanifest, or fix the listed repo. This issue auto-updates on the next run; close it once resolved."')"
+          # Append advisories section when both drift and advisories are present (one issue, not two).
+          advisory_count="$(printf '%s' "$AUDIT_REPORT" | jq '(.advisories // []) | length')"
+          if [ "$advisory_count" -gt 0 ]; then
+            advisory_section="$(printf '%s' "$AUDIT_REPORT" \
+              | jq -r '"\n---\n**Discoverability advisories (informational):**\n" + ([(.advisories // [])[] | "- `\(.code)` — \(.message)"] | join("\n"))')"
+            body="$(printf '%s\n%s' "$drift_body" "$advisory_section")"
+          else
+            body="$drift_body"
+          fi
           existing="$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
           if [ -n "$existing" ]; then
             gh issue comment "$existing" --body "$body"
           else
             gh issue create --title "$title" --body "$body" --label "provenance-drift" 2>/dev/null \
+              || gh issue create --title "$title" --body "$body"
+          fi
+
+      - name: Open or update the discoverability advisory issue
+        if: steps.audit.outputs.status == 'advisory'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pass the report via env, NOT via ${{ }} interpolation into the run body (injection hardening).
+          AUDIT_REPORT: ${{ steps.audit.outputs.report }}
+        run: |
+          # This step fires ONLY when status == "advisory" (drift is empty, advisories non-empty).
+          # It uses a SEPARATE issue title so advisory notices never co-mingle with the provenance-drift
+          # issue. The open-or-update idiom is identical to the drift notify step (DRY reuse, D1).
+          title="cross-repo audit: discoverability advisory"
+          body="$(printf '%s' "$AUDIT_REPORT" \
+            | jq -r '"The scheduled cross-repo audit (.github/workflows/audit.yml) found discoverability\nadvisories for the registry repo (no provenance drift detected):\n\n" + ([(.advisories // [])[] | "- `\(.code)` — \(.message)"] | join("\n")) + "\n\nThese are advisory-only (D3). Address them via GitHub Settings → About / Topics. This issue\nauto-updates on the next run; close it once resolved."')"
+          existing="$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body" --label "advisory" 2>/dev/null \
               || gh issue create --title "$title" --body "$body"
           fi

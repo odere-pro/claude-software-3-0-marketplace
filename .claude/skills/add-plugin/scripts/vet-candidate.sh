@@ -152,16 +152,95 @@ if [ -n "$pj" ]; then
       "$REPO plugin.json license \"$c_lic\" is not in the registry's SPDX allowlist ($SPDX_ALLOWLIST)" \
       "set \"license\" to one of: $SPDX_ALLOWLIST; if a valid newer SPDX id should be allowed, open an issue to expand the allowlist (docs/adding-plugins.md)"
   else
-    # LICENSE_FILE_MISMATCH: GitHub has detected a license for the repo, is not NOASSERTION,
-    # and it differs from the declared SPDX id in plugin.json.
-    # NOASSERTION means GitHub couldn't identify the file format — that is a data-quality issue
-    # in the repo, not a hard mismatch; we only block when GitHub positively identifies a *different*
-    # SPDX id. The operator's coherence ruling (SEED ORDERING vs LICENSE_FILE_MISMATCH) documents
-    # that NOASSERTION cases require the operator to decide; we skip them here.
+    # LICENSE_FILE_MISMATCH (positive path): GitHub has positively identified a *different* SPDX id.
     if [ -n "$repo_gh_spdx" ] && [ "$repo_gh_spdx" != "NOASSERTION" ] && [ "$repo_gh_spdx" != "$c_lic" ]; then
       add_blocker "LICENSE_FILE_MISMATCH" \
         "$REPO plugin.json declares \"$c_lic\" but GitHub detects a \"$repo_gh_spdx\" LICENSE file — the file content and the declared SPDX id must match" \
         "update the LICENSE file in $REPO to match SPDX id \"$c_lic\", or change plugin.json \"license\" to \"$repo_gh_spdx\" (if it is in the allowlist)"
+
+    # LICENSE_FILE_MISMATCH (NOASSERTION path): GitHub returned NOASSERTION (could not parse the
+    # LICENSE file format). We resolve this by fetching the raw LICENSE text and verifying it
+    # contains the canonical per-SPDX-id marker for the declared license.
+    # Trigger: NOASSERTION + declared id is in SPDX_ALLOWLIST (checked by the enclosing `elif`).
+    # Budget: one extra gh api call on the NOASSERTION+allowlisted branch only — constant-cost,
+    # add-time only, never inside run-all.sh (D3/D4/D12).
+    elif [ "$repo_gh_spdx" = "NOASSERTION" ]; then
+      # Fetch the repo's LICENSE file content via the /license endpoint (base64 in .content).
+      lic_txt=""
+      if lic_txt_b64="$(gh api "repos/$REPO/license" --jq '.content' 2>/dev/null)"; then
+        lic_txt="$(printf '%s' "$lic_txt_b64" | base64 -d 2>/dev/null || true)"
+      fi
+
+      if [ -z "$lic_txt" ]; then
+        # Fetch failed (network/data gap). Emit a human note only; do NOT block.
+        # Mirrors the D3 SKIP-not-FAIL philosophy: a fetch failure is not drift.
+        printf '[vet] could not fetch LICENSE for content verification; NOASSERTION not resolvable for %s\n' "$REPO" >&2
+      else
+        # Canonical text-marker lookup (vet-local; no shared file needed — this is the only call site).
+        # Decision rule: if the text does NOT contain the declared id's marker → emit LICENSE_FILE_MISMATCH.
+        # If ambiguous (e.g. BSD-2 vs BSD-3 stem present but distinguishing clause absent) → NO block
+        # (favor false-negative over false-positive).
+        #
+        # Marker table (one unambiguous canonical phrase per SPDX id):
+        #   MIT        — "Permission is hereby granted, free of charge, to any person obtaining a copy"
+        #   Apache-2.0 — "Apache License" AND "Version 2.0"
+        #   BSD-2-Clause / BSD-3-Clause — "Redistribution and use in source and binary forms"
+        #                 (+ BSD-3 additionally: "Neither the name of")
+        #   ISC        — "Permission to use, copy, modify, and/or distribute this software"
+        #   0BSD       — same ISC stem + absence of the BSD redistribution clause; ambiguous → NO block
+        #   MPL-2.0    — "Mozilla Public License Version 2.0"
+        lic_txt_lower="$(printf '%s' "$lic_txt" | tr '[:upper:]' '[:lower:]')"
+        marker_ok=true
+        case "$c_lic" in
+          MIT)
+            printf '%s' "$lic_txt_lower" | grep -qF "permission is hereby granted, free of charge, to any person obtaining a copy" \
+              || marker_ok=false
+            ;;
+          Apache-2.0)
+            printf '%s' "$lic_txt_lower" | grep -qF "apache license" && \
+            printf '%s' "$lic_txt_lower" | grep -qF "version 2.0" \
+              || marker_ok=false
+            ;;
+          BSD-2-Clause)
+            if ! printf '%s' "$lic_txt_lower" | grep -qF "redistribution and use in source and binary forms"; then
+              marker_ok=false
+            fi
+            # If BSD-3 distinguishing clause is present, treat as ambiguous (wrong variant) — NO block.
+            # We can only block if clearly NOT BSD-2 text at all.
+            ;;
+          BSD-3-Clause)
+            if ! printf '%s' "$lic_txt_lower" | grep -qF "redistribution and use in source and binary forms"; then
+              marker_ok=false
+            elif ! printf '%s' "$lic_txt_lower" | grep -qiF "neither the name of"; then
+              # BSD-3 marker absent but BSD-2 stem present → ambiguous, NO block.
+              marker_ok=true
+            fi
+            ;;
+          ISC)
+            printf '%s' "$lic_txt_lower" | grep -qF "permission to use, copy, modify, and/or distribute this software" \
+              || marker_ok=false
+            ;;
+          0BSD)
+            # 0BSD strips the redistribution clause; its marker is the ISC stem.
+            # If the redistribution clause IS present, it is likely BSD-2, but 0BSD is ambiguous → NO block.
+            marker_ok=true
+            ;;
+          MPL-2.0)
+            printf '%s' "$lic_txt_lower" | grep -qF "mozilla public license version 2.0" \
+              || marker_ok=false
+            ;;
+          *)
+            # Unknown id in allowlist (should not occur): NO block (safe default).
+            marker_ok=true
+            ;;
+        esac
+
+        if ! $marker_ok; then
+          add_blocker "LICENSE_FILE_MISMATCH" \
+            "GitHub could not classify $REPO's LICENSE (NOASSERTION); the file text does not contain the canonical marker for the declared SPDX id \"$c_lic\"" \
+            "make the LICENSE file the verbatim canonical text for \"$c_lic\", or change plugin.json \"license\" to the id matching the actual file"
+        fi
+      fi
     fi
   fi
 fi

@@ -177,6 +177,7 @@ else
   # ALL manifest-derived strings are HTML-escaped before interpolation (& < > " ').
   # .homepage is additionally validated: only https:// URLs are emitted as href; anything else
   # drops the link entirely (renders the name as plain text) to prevent attribute injection.
+  # data-keywords carries the space-joined keyword list (HTML-escaped) for client-side filtering.
   plugin_cards="$(mk_each_plugin_ndjson "$manifest" | jq -r '
     def html_esc: gsub("&"; "&amp;") | gsub("<"; "&lt;") | gsub(">"; "&gt;") | gsub("\""; "&quot;") | gsub("'"'"'"; "&#39;");
     def safe_href: if test("^https://") then html_esc else "" end;
@@ -184,7 +185,8 @@ else
     (.name | html_esc) as $name_esc |
     (.description | html_esc) as $desc_esc |
     (.license | html_esc) as $lic_esc |
-    "        <article class=\"card\">\n" +
+    (.keywords | map(html_esc) | join(" ")) as $kw_data |
+    "        <article class=\"card\" data-keywords=\"" + $kw_data + "\">\n" +
     "          <h3>" +
       (if $hp_esc != "" then "<a href=\"" + $hp_esc + "\">" + $name_esc + "</a>" else $name_esc end) +
     "</h3>\n" +
@@ -198,6 +200,99 @@ else
     "          </div>\n" +
     "        </article>"
   ')"
+fi
+
+# ── Keyword filter toolbar (non-empty registry only) ──────────────────────────
+# Derives keyword buckets from existing keywords[] — no manifest field (D6).
+# Stable: unique|sort (matches the all_keywords line above).
+# Renders cleanly at N=0: empty filter_toolbar string = no toolbar in the HTML.
+filter_toolbar=""
+filter_script=""
+filter_css=""
+if [ "$n_plugins" -gt 0 ]; then
+  # Build an array of unique sorted keywords (already computed in all_keywords, rebuild explicitly).
+  kw_buttons=""
+  while IFS= read -r kw; do
+    [ -z "$kw" ] && continue
+    kw_esc="$(html_esc "$kw")"
+    kw_buttons="${kw_buttons}        <button class=\"filter-btn\" type=\"button\" data-kw=\"${kw_esc}\" aria-pressed=\"false\">${kw_esc}</button>
+"
+  done <<EOF
+$(mk_each_plugin_ndjson "$manifest" | jq -rs '[.[].keywords[]] | unique | sort[]')
+EOF
+
+  filter_toolbar="      <div class=\"filter-bar\" role=\"group\" aria-label=\"Filter plugins by keyword\">
+        <span class=\"filter-label\">Filter:</span>
+${kw_buttons}        <button class=\"filter-btn filter-btn-all\" type=\"button\" data-kw=\"\" aria-pressed=\"true\">All</button>
+      </div>"
+
+  # Inline filter script — no remote src (offline, G18 group-2).
+  # Toggles aria-pressed on buttons and shows/hides cards by data-keywords match.
+  filter_script='    <script>
+      (function () {
+        var active = "";
+        document.querySelectorAll(".filter-btn").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            active = btn.dataset.kw;
+            document.querySelectorAll(".filter-btn").forEach(function (b) {
+              b.setAttribute("aria-pressed", b.dataset.kw === active ? "true" : "false");
+            });
+            document.querySelectorAll(".grid .card").forEach(function (card) {
+              if (!active) {
+                card.hidden = false;
+              } else {
+                var kws = card.dataset.keywords ? card.dataset.keywords.split(" ") : [];
+                card.hidden = kws.indexOf(active) === -1;
+              }
+            });
+          });
+        });
+      })();
+    </script>'
+
+  # CSS for the filter bar (inline, no remote link).
+  filter_css='
+      .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1.4rem;
+        align-items: center;
+      }
+
+      .filter-label {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--color-muted);
+        margin-right: 0.3rem;
+      }
+
+      .filter-btn {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-text);
+        background: var(--color-surface);
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        padding: 0.25rem 0.7rem;
+        cursor: pointer;
+        transition: background var(--ease) 150ms, color var(--ease) 150ms, border-color var(--ease) 150ms;
+      }
+
+      .filter-btn:hover {
+        border-color: var(--color-accent-line);
+        color: var(--color-accent);
+      }
+
+      .filter-btn[aria-pressed="true"] {
+        background: var(--color-accent-soft);
+        border-color: var(--color-accent-line);
+        color: var(--color-accent);
+      }
+
+      .card[hidden] {
+        display: none;
+      }'
 fi
 
 pills_n="${n_plugins} plugin$([ "$n_plugins" -eq 1 ] || printf 's')"
@@ -627,6 +722,7 @@ cat >"$tmpdir/index.html" <<HTMLEOF
           animation: none !important;
         }
       }
+${filter_css}
     </style>
   </head>
   <body>
@@ -681,6 +777,7 @@ cat >"$tmpdir/index.html" <<HTMLEOF
         <p class="section-lead">
           Every plugin lives in its own repository and installs individually.
         </p>
+${filter_toolbar}
         <div class="grid">
 ${plugin_cards}
         </div>
@@ -694,6 +791,7 @@ ${plugin_cards}
       <a href="${GITHUB_REPO_URL}/blob/main/SOFTWARE-3-0.md">Software 3.0</a>
       <a href="${GITHUB_REPO_URL}/issues">Issues</a>
     </footer>
+${filter_script}
   </body>
 </html>
 HTMLEOF
