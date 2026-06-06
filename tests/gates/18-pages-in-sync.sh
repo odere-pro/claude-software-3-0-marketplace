@@ -119,6 +119,10 @@ mkdir -p "$xss_site/assets"
 printf 'svg' >"$xss_site/assets/favicon.svg"
 
 # XSS payload manifest — one entry with injection vectors in every rendered field.
+# Includes vectors from the fixed set (onerror=, "><script>, <script>) used by checks
+# 3a/3b/3d, AND additional tag types (<svg onload=>, <iframe src=>) that are NOT in that
+# fixed set — so check 3e (vector-agnostic tag scan) has something distinctive to catch
+# if escaping is ever bypassed for a non-listed vector.
 cat >"$xss_root/.claude-plugin/marketplace.json" <<'XSSJSON'
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
@@ -129,7 +133,7 @@ cat >"$xss_root/.claude-plugin/marketplace.json" <<'XSSJSON'
     {
       "name": "x</a><img src=x onerror=alert(1)>",
       "source": { "source": "github", "repo": "odere-pro/xss-test-plugin" },
-      "description": "abc</script><img src=x onerror=alert(3)>",
+      "description": "abc</script><img src=x onerror=alert(3)><svg onload=alert(9)><iframe src=javascript:alert(8)>",
       "homepage": "https://h\"><script>alert(2)</script>",
       "license": "MIT<script>alert(4)</script>",
       "keywords": ["xss-keyword-test"]
@@ -224,6 +228,27 @@ if $xss_gen_ok && [ -f "$xss_site/index.html" ]; then
   if printf '%s\n' "$xss_html_no_scripts" | grep -qiF '<script>' 2>/dev/null; then
     note "HTML-ESCAPE: generated HTML contains a live '<script>' tag outside known script blocks — license/description XSS not neutralized"
   fi
+
+  # 3e. VECTOR-AGNOSTIC tag scan — defense-in-depth complement to 3a/3b/3d.
+  #
+  # Checks 3a/3b/3d test for a fixed vector set and would miss novel tags (e.g.
+  # <svg onload=>, <iframe>, <img> alone) if a future change bypassed html_esc.
+  # This check is vector-agnostic: it asserts that the raw literal tag substrings
+  # injected by the payload fields are NOT present unescaped in the strip-output.
+  # When escaping is correct, these appear only as &lt;svg, &lt;iframe, etc.
+  #
+  # The payload manifest above includes <svg onload=alert(9)> and
+  # <iframe src=javascript:alert(8)> in the description field — vectors NOT in the
+  # 3a/3b/3d fixed set — so a regression that lets those bypass html_esc will be
+  # caught here even if 3a/3b/3d all pass.
+  #
+  # Grep for the literal raw opening-tag substrings; a match means an unescaped tag
+  # from a payload field survived into the HTML (stored XSS).
+  for _raw_tag in '<svg' '<iframe' '<img' '<script'; do
+    if printf '%s\n' "$xss_html_no_scripts" | grep -qF "$_raw_tag" 2>/dev/null; then
+      note "HTML-ESCAPE (3e vector-agnostic): generated HTML (outside scripts) contains unescaped '${_raw_tag}' from a payload field — manifest-field XSS not neutralized (this vector is outside the 3a/3b/3d fixed set)"
+    fi
+  done
 else
   # Generator invocation failed (broken patch or missing tool) — fall back to a static check
   # so the gate does not silently pass.
