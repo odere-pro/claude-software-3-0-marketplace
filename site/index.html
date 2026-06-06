@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>odere-pro — Claude Code plugin marketplace</title>
+    <meta
+      name="description"
+      content="Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope."
+    />
+    <link rel="canonical" href="https://odere-pro.github.io/claude-software-3-0-marketplace/" />
+    <meta name="theme-color" content="#1c1714" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="application-name" content="odere-pro" />
+    <meta name="author" content="odere-pro" />
+    <meta
+      name="keywords"
+      content="audit, calibration, claude-code-setup, code-quality, config-audit, design-patterns, evaluation, harness, karpathy, knowledge-management, language-agnostic, llm-wiki, markdown, multi-agent, object-oriented-design, obsidian, oop, orchestration, rag, refactoring, solid"
+    />
+    <meta
+      name="robots"
+      content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
+    />
+
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="odere-pro" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:title"
+      content="odere-pro — Claude Code plugin marketplace"
+    />
+    <meta
+      property="og:description"
+      content="Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope."
+    />
+    <meta property="og:url" content="https://odere-pro.github.io/claude-software-3-0-marketplace/" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="odere-pro — Claude Code plugin marketplace"
+    />
+    <meta
+      name="twitter:description"
+      content="Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope."
+    />
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+      {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://odere-pro.github.io/claude-software-3-0-marketplace/#website",
+      "url": "https://odere-pro.github.io/claude-software-3-0-marketplace/",
+      "name": "odere-pro",
+      "description": "Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope.",
+      "inLanguage": "en",
+      "publisher": {
+        "@id": "https://github.com/odere-pro#organization"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://github.com/odere-pro#organization",
+      "name": "odere-pro",
+      "url": "https://github.com/odere-pro",
+      "sameAs": [
+        "https://github.com/odere-pro",
+        "https://github.com/odere-pro/claude-software-3-0-marketplace"
+      ]
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": "https://odere-pro.github.io/claude-software-3-0-marketplace/#plugins",
+      "url": "https://odere-pro.github.io/claude-software-3-0-marketplace/",
+      "name": "odere-pro — Claude Code plugin marketplace",
+      "description": "Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope.",
+      "mainEntity": {
+        "@type": "ItemList",
+        "numberOfItems": 3,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "claude-oop-excellence",
+              "description": "Audits and refactors codebases for object-oriented design quality: parallel RISK + PATTERN analysis tracks, a 102-entity glossary (45 issues, 57 patterns), and gated fix/implement commands — language-agnostic.",
+              "url": "https://github.com/odere-pro/claude-oop-excellence",
+              "applicationCategory": "DeveloperApplication",
+              "license": "https://spdx.org/licenses/MIT.html"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "claude-wiki-pages",
+              "description": "Ships Karpathy's LLM Wiki as a four-layer, hook-enforced Claude Code agent stack with multi-agent orchestration for knowledge management in Obsidian vaults.",
+              "url": "https://github.com/odere-pro/claude-wiki-pages-plugin",
+              "applicationCategory": "DeveloperApplication",
+              "license": "https://spdx.org/licenses/Apache-2.0.html"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "claude-calibration",
+              "description": "Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups (CLAUDE.md, rules, skills, hooks, MCP, plugins) with scoring rubrics and enforcement scaffolding for recurring findings.",
+              "url": "https://github.com/odere-pro/claude-calibration",
+              "applicationCategory": "DeveloperApplication",
+              "license": "https://spdx.org/licenses/MIT.html"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://odere-pro.github.io/claude-software-3-0-marketplace/#breadcrumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://odere-pro.github.io/claude-software-3-0-marketplace/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Plugins",
+          "item": "https://odere-pro.github.io/claude-software-3-0-marketplace/#plugins"
+        }
+      ]
+    }
+  ]
+}
+    </script>
+
+    <style>
+      :root {
+        --color-bg: oklch(22% 0.012 50);
+        --color-bg-raised: oklch(27% 0.016 52);
+        --color-surface: oklch(31% 0.02 54);
+        --color-text: oklch(92% 0.012 70);
+        --color-muted: oklch(76% 0.022 62);
+        --color-accent: oklch(70% 0.13 45);
+        --color-accent-soft: oklch(70% 0.13 45 / 0.16);
+        --color-accent-line: oklch(70% 0.13 45 / 0.4);
+        --color-line: oklch(40% 0.02 55);
+
+        --text-hero: clamp(2.6rem, 1.4rem + 5vw, 5.5rem);
+        --text-lead: clamp(1.1rem, 0.96rem + 0.6vw, 1.4rem);
+        --text-h2: clamp(1.6rem, 1.2rem + 1.5vw, 2.4rem);
+        --space-section: clamp(3.5rem, 2.5rem + 5vw, 7rem);
+
+        --radius: 14px;
+        --radius-sm: 9px;
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+        --font-sans:
+          ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "SF Mono", "JetBrains Mono", "Fira Code", Menlo, Consolas,
+          monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 5rem;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(
+            120% 80% at 75% -10%,
+            var(--color-accent-soft),
+            transparent 60%
+          ),
+          var(--color-bg);
+        color: var(--color-text);
+        font-family: var(--font-sans);
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+
+      .wrap {
+        width: min(1100px, 92vw);
+        margin-inline: auto;
+      }
+
+      .vh {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: 0.5rem;
+        top: 0.5rem;
+        z-index: 50;
+        transform: translateY(-160%);
+        background: var(--color-accent);
+        color: oklch(20% 0.02 50);
+        padding: 0.6rem 1rem;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform var(--ease) 200ms;
+      }
+
+      .skip-link:focus {
+        transform: translateY(0);
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: oklch(22% 0.012 50 / 0.82);
+        backdrop-filter: saturate(140%) blur(10px);
+        border-bottom: 1px solid var(--color-line);
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.4rem 1.2rem;
+        padding-block: 0.9rem;
+      }
+
+      .brand {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+        text-decoration: none;
+      }
+
+      .brand span {
+        color: var(--color-accent);
+      }
+
+      nav .spacer {
+        flex: 1;
+      }
+
+      nav a:not(.brand) {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding-inline: 0.35rem;
+        text-decoration: none;
+        color: var(--color-muted);
+        font-size: 0.95rem;
+        transition: color var(--ease) 200ms;
+      }
+
+      nav a:not(.brand):hover,
+      nav a:not(.brand):focus-visible {
+        color: var(--color-text);
+      }
+
+      .hero {
+        padding-block: var(--space-section);
+      }
+
+      h1 {
+        font-size: var(--text-hero);
+        line-height: 0.98;
+        letter-spacing: -0.03em;
+        margin: 0 0 1.4rem;
+        max-width: 18ch;
+      }
+
+      .lead {
+        font-size: var(--text-lead);
+        color: var(--color-muted);
+        max-width: 58ch;
+        margin: 0 0 1.8rem;
+      }
+
+      .pills {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin: 0 0 2rem;
+        padding: 0;
+      }
+
+      .pills li {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--color-text);
+        background: var(--color-surface);
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        padding: 0.35rem 0.85rem;
+      }
+
+      section.band {
+        padding-block: var(--space-section);
+        border-top: 1px solid var(--color-line);
+      }
+
+      .h2 {
+        font-size: var(--text-h2);
+        letter-spacing: -0.02em;
+        margin: 0 0 0.6rem;
+      }
+
+      .section-lead {
+        color: var(--color-muted);
+        max-width: 62ch;
+        margin: 0 0 2.6rem;
+        font-size: 1.02rem;
+      }
+
+      .kicker {
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--color-accent);
+        margin: 0 0 0.8rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+        gap: 1px;
+        background: var(--color-line);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+
+      .card {
+        background: var(--color-bg-raised);
+        padding: 1.6rem 1.5rem;
+      }
+
+      .card h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.1rem;
+        font-family: var(--font-mono);
+        color: var(--color-accent);
+      }
+
+      .card h3 a {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .card h3 a:hover {
+        text-decoration: underline;
+      }
+
+      .card p,
+      .card .card-desc {
+        margin: 0 0 0.8rem;
+        color: var(--color-muted);
+        font-size: 0.96rem;
+      }
+
+      .install-cmd {
+        margin: 0 0 0.8rem;
+        padding: 0.6rem 0.9rem;
+        background: oklch(16% 0.01 50);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-sm);
+        font-family: var(--font-mono);
+        font-size: 0.88rem;
+        color: var(--color-text);
+        overflow-x: auto;
+      }
+
+      .card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        align-items: center;
+      }
+
+      .license {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-muted);
+        background: var(--color-surface);
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        padding: 0.2rem 0.6rem;
+      }
+
+      .keywords {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem;
+      }
+
+      .chip {
+        font-family: var(--font-mono);
+        font-size: 0.72rem;
+        color: var(--color-text);
+        background: var(--color-surface);
+        border: 1px solid var(--color-line);
+        border-radius: 6px;
+        padding: 0.15rem 0.45rem;
+      }
+
+      .empty-state {
+        grid-column: 1 / -1;
+      }
+
+      .empty-state h3 {
+        color: var(--color-muted);
+      }
+
+      .add-marketplace {
+        background: var(--color-bg-raised);
+        border: 1px solid var(--color-line);
+        border-left: 3px solid var(--color-accent);
+        border-radius: var(--radius);
+        padding: 1.6rem 1.6rem 1.4rem;
+        margin-bottom: 2rem;
+      }
+
+      pre {
+        margin: 0;
+        padding: 1.4rem 1.5rem;
+        background: oklch(16% 0.01 50);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius);
+        max-width: 100%;
+        overflow-x: auto;
+        font-family: var(--font-mono);
+        font-size: 0.95rem;
+        line-height: 1.7;
+        color: var(--color-text);
+      }
+
+      footer {
+        padding-block: 2.5rem;
+        border-top: 1px solid var(--color-line);
+        color: var(--color-muted);
+        font-size: 0.9rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem 1rem;
+        align-items: center;
+      }
+
+      footer .spacer {
+        flex: 1;
+      }
+
+      footer a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        padding-inline: 0.35rem;
+        color: var(--color-muted);
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        color: var(--color-text);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header>
+      <nav class="wrap" aria-label="Primary">
+        <a class="brand" href="#main">odere<span>-pro</span></a>
+        <span class="spacer"></span>
+        <a href="#plugins">Plugins</a>
+        <a href="#add-marketplace">Add the marketplace</a>
+        <a href="https://github.com/odere-pro/claude-software-3-0-marketplace">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero wrap" aria-labelledby="hero-heading">
+        <h1 id="hero-heading">Claude Code plugins, one marketplace.</h1>
+        <p class="lead">Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope.</p>
+        <ul class="pills" aria-label="At a glance">
+          <li>3 plugins</li>
+          <li>agent-operable</li>
+          <li>one contract</li>
+          <li>gates-not-promises</li>
+        </ul>
+      </section>
+
+      <section
+        class="band wrap"
+        id="add-marketplace"
+        aria-labelledby="add-heading"
+      >
+        <p class="kicker">Get started</p>
+        <h2 class="h2" id="add-heading">Add the marketplace</h2>
+        <p class="section-lead">
+          One command to register all plugins under the <code>@odere-pro</code> scope:
+        </p>
+        <div class="add-marketplace">
+          <pre><code>/plugin marketplace add odere-pro/claude-software-3-0-marketplace</code></pre>
+        </div>
+        <p class="section-lead">Then install any plugin individually:</p>
+        <pre><code>/plugin install &lt;name&gt;@odere-pro</code></pre>
+      </section>
+
+      <section
+        class="band wrap"
+        id="plugins"
+        aria-labelledby="plugins-heading"
+      >
+        <p class="kicker">The registry</p>
+        <h2 class="h2" id="plugins-heading">Available plugins</h2>
+        <p class="section-lead">
+          Every plugin lives in its own repository and installs individually.
+        </p>
+        <div class="grid">
+        <article class="card">
+          <h3><a href="https://github.com/odere-pro/claude-oop-excellence">claude-oop-excellence</a></h3>
+          <p class="card-desc">Audits and refactors codebases for object-oriented design quality: parallel RISK + PATTERN analysis tracks, a 102-entity glossary (45 issues, 57 patterns), and gated fix/implement commands — language-agnostic.</p>
+          <pre class="install-cmd"><code>/plugin install claude-oop-excellence@odere-pro</code></pre>
+          <div class="card-meta">
+            <span class="license">MIT</span>
+            <span class="keywords"><span class="chip">oop</span><span class="chip">object-oriented-design</span><span class="chip">solid</span><span class="chip">design-patterns</span><span class="chip">code-quality</span><span class="chip">refactoring</span><span class="chip">audit</span><span class="chip">language-agnostic</span></span>
+          </div>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/odere-pro/claude-wiki-pages-plugin">claude-wiki-pages</a></h3>
+          <p class="card-desc">Ships Karpathy&#39;s LLM Wiki as a four-layer, hook-enforced Claude Code agent stack with multi-agent orchestration for knowledge management in Obsidian vaults.</p>
+          <pre class="install-cmd"><code>/plugin install claude-wiki-pages@odere-pro</code></pre>
+          <div class="card-meta">
+            <span class="license">Apache-2.0</span>
+            <span class="keywords"><span class="chip">obsidian</span><span class="chip">knowledge-management</span><span class="chip">llm-wiki</span><span class="chip">multi-agent</span><span class="chip">orchestration</span><span class="chip">rag</span><span class="chip">karpathy</span><span class="chip">markdown</span></span>
+          </div>
+        </article>
+        <article class="card">
+          <h3><a href="https://github.com/odere-pro/claude-calibration">claude-calibration</a></h3>
+          <p class="card-desc">Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups (CLAUDE.md, rules, skills, hooks, MCP, plugins) with scoring rubrics and enforcement scaffolding for recurring findings.</p>
+          <pre class="install-cmd"><code>/plugin install claude-calibration@odere-pro</code></pre>
+          <div class="card-meta">
+            <span class="license">MIT</span>
+            <span class="keywords"><span class="chip">calibration</span><span class="chip">evaluation</span><span class="chip">config-audit</span><span class="chip">harness</span><span class="chip">orchestration</span><span class="chip">claude-code-setup</span></span>
+          </div>
+        </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="wrap">
+      <span>MIT-licensed &middot; <a href="https://github.com/odere-pro/claude-software-3-0-marketplace">odere-pro/claude-software-3-0-marketplace</a></span>
+      <span class="spacer"></span>
+      <a href="https://github.com/odere-pro/claude-software-3-0-marketplace#readme">Docs</a>
+      <a href="https://github.com/odere-pro/claude-software-3-0-marketplace/blob/main/SOFTWARE-3-0.md">Software 3.0</a>
+      <a href="https://github.com/odere-pro/claude-software-3-0-marketplace/issues">Issues</a>
+    </footer>
+  </body>
+</html>

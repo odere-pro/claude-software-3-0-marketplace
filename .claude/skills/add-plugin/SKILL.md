@@ -7,7 +7,7 @@ description: >-
   suite, then opens a PR. Invoke explicitly as /add-plugin <repo> [--name <name>]. Edits files.
 disable-model-invocation: true
 model: sonnet
-argument-hint: "<repo|owner/repo> [--name <name>]"
+argument-hint: "<repo|owner/repo> [--name <name>] [--description \"…\"] [--keywords a,b,c]"
 allowed-tools: Read, Grep, Glob, Agent, Edit(.claude-plugin/marketplace.json), Edit(README.md), Edit(CHANGELOG.md), Bash(bash .claude/skills/add-plugin/scripts/vet-candidate.sh:*), Bash(bash .claude/skills/add-plugin/scripts/add-entry.sh:*), Bash(bash .claude/skills/add-plugin/scripts/sync-readme.sh:*), Bash(bash tests/gates/run-all.sh), Bash(claude plugin validate:*), Bash(git checkout:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(gh pr create:*)
 ---
 
@@ -26,6 +26,8 @@ plus optional `--name <name>` to override the entry name.
 1. **Vet + curate.** Delegate to the `plugin-onboarder` subagent with the repo argument. It runs
    `vet-candidate.sh`, and if clean, returns a structured proposal: `repo`, `name`, a
    marketplace-quality `description`, `homepage`, `license`, `keywords`, and any `blockers`.
+   If `--description` or `--keywords` were supplied by the caller, they override the subagent's
+   curated values when passed to `add-entry.sh` in step 3.
 2. **Stop on blockers.** If the proposal is not `ok`, print each blocker and the fix and **stop** — make
    no edits. The most common blocker: the candidate still ships its own `.claude-plugin/marketplace.json`
    (the `odere-pro` name collision). Tell the user to remove it in that repo first (the same change made

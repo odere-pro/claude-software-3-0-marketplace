@@ -1,0 +1,86 @@
+name: Request license allowlist expansion
+description: >
+  Request that a new SPDX license identifier be added to the marketplace allowlist (D14).
+  The current allowlist is: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD, MPL-2.0.
+labels: ["license-allowlist"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The `odere-pro` marketplace only lists plugins whose `license` field in
+        `.claude-plugin/plugin.json` matches one of the allowlisted SPDX identifiers
+        (enforced by `tests/gates/02-marketplace-shape.sh` and `vet-candidate.sh`).
+
+        **Current allowlist:** `MIT` · `Apache-2.0` · `BSD-2-Clause` · `BSD-3-Clause` · `ISC` · `0BSD` · `MPL-2.0`
+
+        The policy covers permissive licenses and file-level weak copyleft only. Expanding the list
+        requires a maintainer decision; use this form to make the case.
+
+        Security issues must go through the private advisory channel in `SECURITY.md`, not this form.
+
+  - type: input
+    id: spdx_id
+    attributes:
+      label: SPDX license identifier
+      description: >
+        The exact SPDX identifier you need added. See https://spdx.org/licenses/ for the
+        canonical list. Must be an OSI-approved or FSF-free identifier.
+      placeholder: EUPL-1.2
+    validations:
+      required: true
+
+  - type: input
+    id: plugin_repo
+    attributes:
+      label: Plugin repo that would use this license (owner/name)
+      description: >
+        The `odere-pro` repo whose `plugin.json` declares this license.
+        Leave blank if this is a general policy proposal not tied to a specific plugin.
+      placeholder: odere-pro/claude-my-plugin
+
+  - type: textarea
+    id: justification
+    attributes:
+      label: Justification
+      description: >
+        Explain why this license should be in the allowlist. Address:
+        (1) How it is categorised (permissive / weak copyleft / strong copyleft / other).
+        (2) Whether it is OSI-approved and/or FSF-free.
+        (3) Any compatibility concern with the existing allowlist terms.
+        (4) Why the existing allowlist terms do not meet your need.
+      placeholder: |
+        This license is OSI-approved and permissive. It is compatible with MIT and Apache-2.0.
+        The project cannot relicense to an existing allowlist term because ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: license_category
+    attributes:
+      label: License category
+      description: Select the best-fit category for the requested identifier.
+      options:
+        - Permissive (no copyleft)
+        - Weak copyleft / file-level (like MPL-2.0)
+        - Strong copyleft (like GPL) — note this is unlikely to be approved
+        - Other / unsure
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: osi_fsf
+    attributes:
+      label: Certification
+      options:
+        - label: This identifier is on the [OSI-approved list](https://opensource.org/licenses/).
+        - label: This identifier is on the [FSF free software list](https://www.gnu.org/licenses/license-list.html).
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References (optional)
+      description: >
+        Links to the SPDX entry, OSI page, FSF page, or other supporting material.
+      placeholder: |
+        - SPDX: https://spdx.org/licenses/EUPL-1.2.html
+        - OSI:  https://opensource.org/license/eupl-1-2/

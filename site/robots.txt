@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://odere-pro.github.io/claude-software-3-0-marketplace/sitemap.xml

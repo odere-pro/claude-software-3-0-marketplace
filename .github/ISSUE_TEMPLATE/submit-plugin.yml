@@ -1,0 +1,109 @@
+name: Submit a plugin for listing
+description: >
+  Request that your odere-pro plugin be added to the marketplace registry.
+  The maintainer runs /vet-plugin and /add-plugin after reviewing this form.
+labels: ["plugin-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, verify your repo satisfies the listability contract
+        documented in `docs/adding-plugins.md`:
+
+        - Owned by **`odere-pro`** (registry is odere-pro-only).
+        - Has a valid `.claude-plugin/plugin.json` with `name`, `description`, and `license`.
+        - Ships at least one component directory (`commands/`, `agents/`, `skills/`, or `hooks/`).
+        - Ships **no** `.claude-plugin/marketplace.json` of its own.
+        - `description` is ≥ 20 characters and not a repeat of `name`; `keywords` lists ≥ 1 term.
+
+        Security issues must go through the private advisory channel in `SECURITY.md`, not this form.
+
+  - type: input
+    id: repo
+    attributes:
+      label: Repository (owner/name)
+      description: >
+        The full GitHub repo slug. Must be `odere-pro/<repo-name>`.
+        The entry name may differ from the repo basename (specify below if so).
+      placeholder: odere-pro/claude-my-plugin
+    validations:
+      required: true
+
+  - type: input
+    id: entry_name
+    attributes:
+      label: Entry name (leave blank to use repo basename)
+      description: >
+        The name that will appear in the marketplace registry. Defaults to the repo basename.
+        Must be unique across all listed entries. Use only letters, digits, hyphens, underscores, dots.
+      placeholder: my-plugin
+
+  - type: textarea
+    id: what_it_does
+    attributes:
+      label: What does the plugin do?
+      description: >
+        A plain-English summary of the plugin's purpose and the problem it solves.
+        This helps the maintainer curate the `description` and `keywords` fields.
+      placeholder: |
+        Briefly describe what agents, skills, hooks, or commands this plugin provides
+        and what workflow it improves.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: components
+    attributes:
+      label: Component directories present in the repo
+      description: >
+        Check all that apply. At least one is required — a plugin with a `plugin.json`
+        but no components is an empty shell and will be blocked by the vet.
+      options:
+        - label: "`commands/`"
+        - label: "`agents/`"
+        - label: "`skills/`"
+        - label: "`hooks/`"
+
+  - type: dropdown
+    id: license
+    attributes:
+      label: SPDX license identifier
+      description: >
+        The SPDX identifier declared in the repo's `.claude-plugin/plugin.json`.
+        Must be in the allowlist (D14). If your license is not listed, open a
+        "Request license allowlist expansion" issue instead.
+      options:
+        - MIT
+        - Apache-2.0
+        - BSD-2-Clause
+        - BSD-3-Clause
+        - ISC
+        - 0BSD
+        - MPL-2.0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Pre-submission checklist
+      description: All boxes must be checked before the maintainer can act on this request.
+      options:
+        - label: >
+            The repo is `odere-pro`-owned and ships a valid `.claude-plugin/plugin.json`
+            (`name` + `description` + `license`).
+          required: true
+        - label: >
+            The repo ships **no** `.claude-plugin/marketplace.json` of its own
+            (a second `odere-pro` marketplace would shadow this registry).
+          required: true
+        - label: >
+            The repo ships at least one component directory
+            (`commands/`, `agents/`, `skills/`, or `hooks/`).
+          required: true
+        - label: >
+            `plugin.json` `description` is ≥ 20 characters and is not just a repeat of the `name`.
+          required: true
+        - label: >
+            `plugin.json` `keywords` lists at least one term.
+          required: true

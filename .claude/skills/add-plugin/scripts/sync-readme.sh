@@ -38,12 +38,13 @@ blockfile="$(mktemp)"
     # License and Keywords columns are rendered straight from the manifest (roadmap P13h): License is
     # the entry `.license`; Keywords joins `.keywords` with ", ". Both stay in sync with the manifest
     # because this generator is the single source for the table (G9 checks byte-equality).
-    jq -r '
-      .plugins[]
-      | "| `\(.name)` | [\(.source.repo)](https://github.com/\(.source.repo)) | "
-        + "\(.description | gsub("\n"; " ")) | \(.license // "—") | "
-        + "\((.keywords // []) | map("`" + . + "`") | join(", ") | if . == "" then "—" else . end) |"
-    ' "$manifest"
+    # Field normalization (.license fallback, .keywords null-coalesce, homepage) is shared via
+    # mk_each_plugin_ndjson in lib.sh (W2.3 DRY extraction).
+    mk_each_plugin_ndjson "$manifest" | jq -r '
+      "| `\(.name)` | [\(.repo)](https://github.com/\(.repo)) | "
+        + "\(.description) | \(.license) | "
+        + "\(.keywords | map("`" + . + "`") | join(", ") | if . == "" then "—" else . end) |"
+    '
   fi
   printf '%s\n' "$end"
 } >"$blockfile"

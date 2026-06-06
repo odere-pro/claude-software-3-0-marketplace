@@ -28,9 +28,9 @@ VET="tests/../.claude/skills/add-plugin/scripts/vet-candidate.sh"
 fail=0
 note() { echo "  FAIL: $1"; fail=1; }
 
-# The VET_CODES enum, kept in sync with vet-candidate.sh's documented enum (lines 39-40 there).
+# The VET_CODES enum, kept in sync with vet-candidate.sh's documented enum (lines 39-41 there).
 # A blocker `code` outside this set is a contract violation.
-VET_CODES='["OWNER_NOT_ALLOWED","PLUGIN_JSON_UNREADABLE","PLUGIN_JSON_INVALID","SHIPS_MARKETPLACE_JSON","MISSING_NAME","MISSING_DESCRIPTION","MISSING_LICENSE","LICENSE_NOT_ALLOWED","ALREADY_LISTED"]'
+VET_CODES='["OWNER_NOT_ALLOWED","PLUGIN_JSON_UNREADABLE","PLUGIN_JSON_INVALID","SHIPS_MARKETPLACE_JSON","MISSING_NAME","MISSING_DESCRIPTION","MISSING_LICENSE","LICENSE_NOT_ALLOWED","ALREADY_LISTED","NO_COMPONENTS","REPO_ARCHIVED","REPO_PRIVATE","LICENSE_FILE_MISMATCH"]'
 
 # The shape validator: a verdict is well-formed iff `blockers` is an array and EVERY blocker is an
 # object carrying non-empty string `code` (in the enum), `message`, and `fix`. Emits "OK" or the
@@ -66,13 +66,23 @@ printf '%s' "$usage_out" | grep -qi 'usage' || note "vet-candidate.sh usage-erro
 # ── 2. shape contract: validator ACCEPTS well-formed, REJECTS malformed ─────────────────────────
 good='{"ok":false,"repo":"odere-pro/x","name":"x","description":"d","homepage":"https://h","license":"MIT","keywords":["k"],"blockers":[{"code":"MISSING_NAME","message":"m","fix":"f"},{"code":"LICENSE_NOT_ALLOWED","message":"m2","fix":"f2"}]}'
 ok_empty='{"ok":true,"repo":"odere-pro/x","name":"x","description":"d","homepage":"https://h","license":"MIT","keywords":["k"],"blockers":[]}'
+# Positive fixtures for the repo-posture codes (Phase-1 additions): each must be accepted.
+good_archived='{"ok":false,"repo":"odere-pro/x","name":"x","description":"d","homepage":"https://h","license":"MIT","keywords":["k"],"blockers":[{"code":"REPO_ARCHIVED","message":"m","fix":"f"}]}'
+good_private='{"ok":false,"repo":"odere-pro/x","name":"x","description":"d","homepage":"https://h","license":"MIT","keywords":["k"],"blockers":[{"code":"REPO_PRIVATE","message":"m","fix":"f"}]}'
+good_lfm='{"ok":false,"repo":"odere-pro/x","name":"x","description":"d","homepage":"https://h","license":"MIT","keywords":["k"],"blockers":[{"code":"LICENSE_FILE_MISMATCH","message":"m","fix":"f"}]}'
+good_nc='{"ok":false,"repo":"odere-pro/x","name":"x","description":"d","homepage":"https://h","license":"MIT","keywords":["k"],"blockers":[{"code":"NO_COMPONENTS","message":"m","fix":"f"}]}'
 bad_no_code='{"blockers":[{"message":"m","fix":"f"}]}'
 bad_no_fix='{"blockers":[{"code":"MISSING_NAME","message":"m"}]}'
 bad_bad_code='{"blockers":[{"code":"NOT_A_REAL_CODE","message":"m","fix":"f"}]}'
 bad_string='{"blockers":["a raw string blocker"]}'
 
-printf '%s' "$good"     | validate >/dev/null 2>&1 || note "validator rejected a well-formed coded verdict"
-printf '%s' "$ok_empty" | validate >/dev/null 2>&1 || note "validator rejected a valid empty-blockers verdict"
+printf '%s' "$good"         | validate >/dev/null 2>&1 || note "validator rejected a well-formed coded verdict"
+printf '%s' "$ok_empty"     | validate >/dev/null 2>&1 || note "validator rejected a valid empty-blockers verdict"
+# Repo-posture codes (Phase-1): each must be accepted by the validator.
+printf '%s' "$good_archived" | validate >/dev/null 2>&1 || note "validator rejected a REPO_ARCHIVED blocker"
+printf '%s' "$good_private"  | validate >/dev/null 2>&1 || note "validator rejected a REPO_PRIVATE blocker"
+printf '%s' "$good_lfm"      | validate >/dev/null 2>&1 || note "validator rejected a LICENSE_FILE_MISMATCH blocker"
+printf '%s' "$good_nc"       | validate >/dev/null 2>&1 || note "validator rejected a NO_COMPONENTS blocker"
 # Each malformed verdict MUST be rejected; if the validator accepts it, the contract guard is broken.
 for bad in "bad_no_code" "bad_no_fix" "bad_bad_code" "bad_string"; do
   if printf '%s' "${!bad}" | validate >/dev/null 2>&1; then

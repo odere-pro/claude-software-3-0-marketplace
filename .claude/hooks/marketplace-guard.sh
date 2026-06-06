@@ -37,6 +37,11 @@ esac
 
 SECRET_RE='(sk-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{50,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{12,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)'
 
+# Generic-keyword denylist (W2.1): Write-path structural mirror of tests/gates/02-marketplace-shape.sh.
+# Kept byte-identical with the gate's KEYWORD_DENYLIST constant via parity check in
+# 00-harness-integrity.sh (§5). To extend the list, edit both sites and update G0's parity pair.
+KEYWORD_DENYLIST='claude plugin tool utility helper code ai assistant cli'
+
 block() {
   echo "[marketplace-guard] BLOCKED: $1" >&2
   echo "[marketplace-guard] marketplace.json must stay a clean registry index:" >&2
@@ -82,6 +87,24 @@ bad=[(p.get('source') or {}).get('repo','') for p in d.get('plugins',[])
 print(' '.join(r or '(missing)' for r in bad))" 2>/dev/null || printf '')"
   [ -z "$badrepo" ] || block "entry source.repo must be odere-pro/<repo>: $badrepo"
   if printf '%s' "$CONTENT" | grep -qE "$SECRET_RE"; then block "content contains a secret-shaped token"; fi
+  # Structural keyword check: every entry that has keywords must have >= 1 non-generic keyword (W2.1).
+  # Per D2, this is a structural Write-path guard; per-field quality details are authoritative in G2.
+  allgeneric="$(printf '%s' "$CONTENT" | python3 -c "
+import sys, json
+content = sys.stdin.read()
+try:
+    d = json.loads(content)
+except Exception:
+    sys.exit(0)
+deny = set('$KEYWORD_DENYLIST'.split())
+bad = []
+for p in d.get('plugins', []):
+    kws = [k.lower() for k in (p.get('keywords') or [])]
+    if kws and all(k in deny for k in kws):
+        bad.append(p.get('name') or '(unnamed)')
+print(' '.join(bad))
+" 2>/dev/null || printf '')"
+  [ -z "$allgeneric" ] || block "entries have only generic keywords (add at least one specific keyword): $allgeneric"
   exit 0
 fi
 

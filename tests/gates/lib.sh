@@ -23,4 +23,4 @@ GATES_MARKETPLACE=".claude-plugin/marketplace.json"
 # flat enumeration, not a recursive walk: it stays O(documented-layers) and dependency-free. If the
 # layer count grows past a couple dozen, revisit whether a `find -name CLAUDE.md` walk is cheaper.
 # shellcheck disable=SC2034
-GATES_DOCUMENTED_DIRS=".claude-plugin .github .claude tests/gates docs docs/brainstorm docs/plan .claude/teams"
+GATES_DOCUMENTED_DIRS=".claude-plugin .github .claude tests/gates docs docs/brainstorm docs/plan .claude/teams site"

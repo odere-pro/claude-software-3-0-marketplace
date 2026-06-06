@@ -38,7 +38,7 @@ name_from_repo="${REPO##*/}"
 # The verdict-shape gate (tests/gates/10-vet-verdict-schema.sh) asserts each blocker carries all three.
 # VET_CODES: OWNER_NOT_ALLOWED PLUGIN_JSON_UNREADABLE PLUGIN_JSON_INVALID SHIPS_MARKETPLACE_JSON
 #            MISSING_NAME MISSING_DESCRIPTION MISSING_LICENSE LICENSE_NOT_ALLOWED ALREADY_LISTED
-#            NO_COMPONENTS
+#            NO_COMPONENTS REPO_ARCHIVED REPO_PRIVATE LICENSE_FILE_MISMATCH
 #
 # SPDX license allowlist (roadmap P10 / D14): permissive + file-level weak copyleft only. Shared
 # by-value with tests/gates/02-marketplace-shape.sh (the G2 license check); the two sites are kept
@@ -56,6 +56,27 @@ if [ "$owner" != "$MK_OWNER" ]; then
   add_blocker "OWNER_NOT_ALLOWED" \
     "owner is \"$owner\"; this registry lists $MK_OWNER repos only" \
     "transfer or re-fork the plugin under the $MK_OWNER org, then re-run the vet"
+fi
+
+# Repo-posture probe: fetch repo metadata (1 gh api call) to check archived/private status and the
+# GitHub-detected license SPDX id. Covers REPO_ARCHIVED + REPO_PRIVATE + LICENSE_FILE_MISMATCH.
+# Runs for odere-pro repos only (if OWNER_NOT_ALLOWED already fired, we skip to avoid noise).
+repo_meta=""
+repo_gh_spdx=""
+if [ "$owner" = "$MK_OWNER" ]; then
+  if repo_meta="$(gh api "repos/$REPO" 2>/dev/null)"; then
+    if [ "$(printf '%s' "$repo_meta" | jq -r '.archived // false')" = "true" ]; then
+      add_blocker "REPO_ARCHIVED" \
+        "$REPO is archived — listing a read-only archived repo is not permitted" \
+        "un-archive the repo on GitHub (Settings → Danger Zone → Unarchive), then re-run the vet"
+    fi
+    if [ "$(printf '%s' "$repo_meta" | jq -r '.private // false')" = "true" ]; then
+      add_blocker "REPO_PRIVATE" \
+        "$REPO is private — the registry only lists public repos" \
+        "set the repo visibility to Public on GitHub (Settings → Danger Zone → Change visibility), then re-run the vet"
+    fi
+    repo_gh_spdx="$(printf '%s' "$repo_meta" | jq -r '.license.spdx_id // ""')"
+  fi
 fi
 
 # Fetch the candidate plugin.json (base64 from the contents API).
@@ -130,6 +151,18 @@ if [ -n "$pj" ]; then
     add_blocker "LICENSE_NOT_ALLOWED" \
       "$REPO plugin.json license \"$c_lic\" is not in the registry's SPDX allowlist ($SPDX_ALLOWLIST)" \
       "set \"license\" to one of: $SPDX_ALLOWLIST; if a valid newer SPDX id should be allowed, open an issue to expand the allowlist (docs/adding-plugins.md)"
+  else
+    # LICENSE_FILE_MISMATCH: GitHub has detected a license for the repo, is not NOASSERTION,
+    # and it differs from the declared SPDX id in plugin.json.
+    # NOASSERTION means GitHub couldn't identify the file format — that is a data-quality issue
+    # in the repo, not a hard mismatch; we only block when GitHub positively identifies a *different*
+    # SPDX id. The operator's coherence ruling (SEED ORDERING vs LICENSE_FILE_MISMATCH) documents
+    # that NOASSERTION cases require the operator to decide; we skip them here.
+    if [ -n "$repo_gh_spdx" ] && [ "$repo_gh_spdx" != "NOASSERTION" ] && [ "$repo_gh_spdx" != "$c_lic" ]; then
+      add_blocker "LICENSE_FILE_MISMATCH" \
+        "$REPO plugin.json declares \"$c_lic\" but GitHub detects a \"$repo_gh_spdx\" LICENSE file — the file content and the declared SPDX id must match" \
+        "update the LICENSE file in $REPO to match SPDX id \"$c_lic\", or change plugin.json \"license\" to \"$repo_gh_spdx\" (if it is in the allowlist)"
+    fi
   fi
 fi
 
