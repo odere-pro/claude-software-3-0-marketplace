@@ -33,18 +33,22 @@
         "source": "github",
         "repo": "odere-pro/claude-wiki-pages-plugin"
       },
-      "description": "Ships Karpathy's LLM Wiki as a four-layer, hook-enforced Claude Code agent stack with multi-agent orchestration for knowledge management in Obsidian vaults.",
+      "description": "Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy's LLM Wiki pattern: a four-layer stack of 23 skills, 7 agents, and 15 schema-enforcing hooks ingests sources into typed, citation-verified pages — with offline Ollama support and git-checkpointed self-healing.",
       "homepage": "https://github.com/odere-pro/claude-wiki-pages-plugin",
       "license": "Apache-2.0",
       "keywords": [
         "obsidian",
+        "knowledge-base",
         "knowledge-management",
         "llm-wiki",
-        "multi-agent",
-        "orchestration",
         "rag",
-        "karpathy",
-        "markdown"
+        "multi-agent",
+        "agentic",
+        "markdown",
+        "provenance",
+        "local-models",
+        "ollama",
+        "karpathy"
       ]
     },
     {

@@ -16,7 +16,7 @@
     <meta name="author" content="odere-pro" />
     <meta
       name="keywords"
-      content="audit, calibration, claude-code-setup, code-quality, config-audit, design-patterns, evaluation, harness, karpathy, knowledge-management, language-agnostic, llm-wiki, markdown, multi-agent, object-oriented-design, obsidian, oop, orchestration, rag, refactoring, solid"
+      content="agentic, audit, calibration, claude-code-setup, code-quality, config-audit, design-patterns, evaluation, harness, karpathy, knowledge-base, knowledge-management, language-agnostic, llm-wiki, local-models, markdown, multi-agent, object-oriented-design, obsidian, ollama, oop, orchestration, provenance, rag, refactoring, solid"
     />
     <meta
       name="robots"
@@ -104,7 +104,7 @@
             "item": {
               "@type": "SoftwareApplication",
               "name": "claude-wiki-pages",
-              "description": "Ships Karpathy's LLM Wiki as a four-layer, hook-enforced Claude Code agent stack with multi-agent orchestration for knowledge management in Obsidian vaults.",
+              "description": "Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy's LLM Wiki pattern: a four-layer stack of 23 skills, 7 agents, and 15 schema-enforcing hooks ingests sources into typed, citation-verified pages — with offline Ollama support and git-checkpointed self-healing.",
               "url": "https://github.com/odere-pro/claude-wiki-pages-plugin",
               "applicationCategory": "DeveloperApplication",
               "license": "https://spdx.org/licenses/Apache-2.0.html"
@@ -611,6 +611,7 @@
         </p>
       <div class="filter-bar" role="group" aria-label="Filter plugins by keyword">
         <span class="filter-label">Filter:</span>
+        <button class="filter-btn" type="button" data-kw="agentic" aria-pressed="false">agentic</button>
         <button class="filter-btn" type="button" data-kw="audit" aria-pressed="false">audit</button>
         <button class="filter-btn" type="button" data-kw="calibration" aria-pressed="false">calibration</button>
         <button class="filter-btn" type="button" data-kw="claude-code-setup" aria-pressed="false">claude-code-setup</button>
@@ -620,15 +621,19 @@
         <button class="filter-btn" type="button" data-kw="evaluation" aria-pressed="false">evaluation</button>
         <button class="filter-btn" type="button" data-kw="harness" aria-pressed="false">harness</button>
         <button class="filter-btn" type="button" data-kw="karpathy" aria-pressed="false">karpathy</button>
+        <button class="filter-btn" type="button" data-kw="knowledge-base" aria-pressed="false">knowledge-base</button>
         <button class="filter-btn" type="button" data-kw="knowledge-management" aria-pressed="false">knowledge-management</button>
         <button class="filter-btn" type="button" data-kw="language-agnostic" aria-pressed="false">language-agnostic</button>
         <button class="filter-btn" type="button" data-kw="llm-wiki" aria-pressed="false">llm-wiki</button>
+        <button class="filter-btn" type="button" data-kw="local-models" aria-pressed="false">local-models</button>
         <button class="filter-btn" type="button" data-kw="markdown" aria-pressed="false">markdown</button>
         <button class="filter-btn" type="button" data-kw="multi-agent" aria-pressed="false">multi-agent</button>
         <button class="filter-btn" type="button" data-kw="object-oriented-design" aria-pressed="false">object-oriented-design</button>
         <button class="filter-btn" type="button" data-kw="obsidian" aria-pressed="false">obsidian</button>
+        <button class="filter-btn" type="button" data-kw="ollama" aria-pressed="false">ollama</button>
         <button class="filter-btn" type="button" data-kw="oop" aria-pressed="false">oop</button>
         <button class="filter-btn" type="button" data-kw="orchestration" aria-pressed="false">orchestration</button>
+        <button class="filter-btn" type="button" data-kw="provenance" aria-pressed="false">provenance</button>
         <button class="filter-btn" type="button" data-kw="rag" aria-pressed="false">rag</button>
         <button class="filter-btn" type="button" data-kw="refactoring" aria-pressed="false">refactoring</button>
         <button class="filter-btn" type="button" data-kw="solid" aria-pressed="false">solid</button>
@@ -644,13 +649,13 @@
             <span class="keywords"><span class="chip">oop</span><span class="chip">object-oriented-design</span><span class="chip">solid</span><span class="chip">design-patterns</span><span class="chip">code-quality</span><span class="chip">refactoring</span><span class="chip">audit</span><span class="chip">language-agnostic</span></span>
           </div>
         </article>
-        <article class="card" data-keywords="obsidian knowledge-management llm-wiki multi-agent orchestration rag karpathy markdown">
+        <article class="card" data-keywords="obsidian knowledge-base knowledge-management llm-wiki rag multi-agent agentic markdown provenance local-models ollama karpathy">
           <h3><a href="https://github.com/odere-pro/claude-wiki-pages-plugin">claude-wiki-pages</a></h3>
-          <p class="card-desc">Ships Karpathy&#39;s LLM Wiki as a four-layer, hook-enforced Claude Code agent stack with multi-agent orchestration for knowledge management in Obsidian vaults.</p>
+          <p class="card-desc">Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy&#39;s LLM Wiki pattern: a four-layer stack of 23 skills, 7 agents, and 15 schema-enforcing hooks ingests sources into typed, citation-verified pages — with offline Ollama support and git-checkpointed self-healing.</p>
           <pre class="install-cmd"><code>/plugin install claude-wiki-pages@odere-pro</code></pre>
           <div class="card-meta">
             <span class="license">Apache-2.0</span>
-            <span class="keywords"><span class="chip">obsidian</span><span class="chip">knowledge-management</span><span class="chip">llm-wiki</span><span class="chip">multi-agent</span><span class="chip">orchestration</span><span class="chip">rag</span><span class="chip">karpathy</span><span class="chip">markdown</span></span>
+            <span class="keywords"><span class="chip">obsidian</span><span class="chip">knowledge-base</span><span class="chip">knowledge-management</span><span class="chip">llm-wiki</span><span class="chip">rag</span><span class="chip">multi-agent</span><span class="chip">agentic</span><span class="chip">markdown</span><span class="chip">provenance</span><span class="chip">local-models</span><span class="chip">ollama</span><span class="chip">karpathy</span></span>
           </div>
         </article>
         <article class="card" data-keywords="calibration evaluation config-audit harness orchestration claude-code-setup">
