@@ -14,3 +14,5 @@ plugin-specific quick start on top.
 
 - [`claude-oop-excellence.md`](claude-oop-excellence.md) — OOP-quality audit + gated fix/implement;
   `/onboarding` → `/audit` → `/fix-risks` | `/implement-patterns`.
+- [`claude-calibration.md`](claude-calibration.md) — evaluate → plan → calibrate loop over your Claude
+  Code setup; `/calibration` → `/calibration-audit` → `/calibrate "<goal>"`.
