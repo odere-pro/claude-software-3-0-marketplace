@@ -12,5 +12,7 @@ Author-only documentation (not shipped; not loaded into end-user sessions).
   protocol) that ideates the agentic-engineering level-up.
 - [`plan/`](plan/) — phased roadmaps (proposals) produced by the brainstorm team and consumed by
   `registry-dev`.
+- [`plugins/`](plugins/) — per-plugin install + quick-start guides for listed plugins (one file per
+  plugin; mirrors each plugin's own README quick start so the registry is self-sufficient).
 
 Keep docs link-clean — `tests/gates/05-doc-links.sh` fails CI on a dangling intra-repo `.md` link.
