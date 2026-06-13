@@ -43,6 +43,35 @@ Once the marketplace is added, install any plugin individually:
 /plugin install <plugin>@odere-pro
 ```
 
+From the shell, the same steps are `claude plugin marketplace add …` and
+`claude plugin install <plugin>@odere-pro`. Plugins install **per-user (per machine), not
+per-project** — once installed, a plugin is available in every repo you open. A session restart may be
+needed for its commands, agents, and hooks to load.
+
+## Test a plugin
+
+To try a plugin against a specific project, open that project and drive the plugin's commands there
+(the install is global, so there's nothing to reinstall):
+
+```bash
+gh repo clone <owner>/<repo> -- -b <branch>   # the project to test against
+cd <repo>
+claude                                          # start a session in this repo
+```
+
+Then run the plugin's entry-point commands — each plugin documents its own in its repo README. For
+example, `claude-wiki-pages` exposes `/claude-wiki-pages:onboarding` (guided setup),
+`/claude-wiki-pages:wiki` (the orchestrator), and `/claude-wiki-pages:doctor` (health check).
+
+Inspect or manage an installed plugin from the shell:
+
+```bash
+claude plugin list                 # what's installed / enabled
+claude plugin details <plugin>     # component inventory + projected token cost
+claude plugin update <plugin>      # pull the latest from the plugin repo's default branch
+claude plugin uninstall <plugin>   # remove it
+```
+
 ## Plugins
 
 <!-- The table below is generated from .claude-plugin/marketplace.json by

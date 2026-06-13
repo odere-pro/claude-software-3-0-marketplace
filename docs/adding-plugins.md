@@ -2,7 +2,7 @@
 
 This is the canonical, agent-driven process for **adding, updating, and removing** plugins in the
 `odere-pro` registry. It is **author-only** tooling — it edits this repo's `marketplace.json`, README,
-and CHANGELOG, and opens a PR. It never edits a plugin's own repository.
+CHANGELOG, and the generated Pages `site/`, and opens a PR. It never edits a plugin's own repository.
 
 ## TL;DR
 
@@ -157,8 +157,10 @@ gh api repos/<owner>/<repo>/contents/.claude-plugin/plugin.json --jq '.content' 
 | `update-entry.sh` | re-vets, then replaces an existing entry in place (refresh / repoint / rename) |
 | `remove-entry.sh` | deletes an entry by name with `jq` |
 | `sync-readme.sh` | regenerates the README Plugins table from the manifest |
+| `sync-site.sh` | regenerates the Pages `site/` (one card per plugin) from the manifest; `--check` diffs without writing |
 | gate `02-marketplace-shape` | CI enforcement of the contract above (allows an empty registry) |
 | gate `09-readme-in-sync` | README table can't drift from the manifest |
+| gate `18-pages-in-sync` | the Pages `site/` can't drift from the manifest (run `sync-site.sh` after every entry change) |
 
 ## Clearing the common blockers
 
@@ -204,6 +206,7 @@ is listed.
 
 If you'd rather edit by hand: append one `github`-source block to the `plugins` array in
 `.claude-plugin/marketplace.json` (no `version`/`sha`), run
-`bash .claude/skills/add-plugin/scripts/sync-readme.sh`, add a `CHANGELOG.md` bullet, then
-`bash tests/gates/run-all.sh` (and `claude plugin validate .`). See
-[`CONTRIBUTING.md`](../CONTRIBUTING.md).
+`bash .claude/skills/add-plugin/scripts/sync-readme.sh` **and**
+`bash .claude/skills/add-plugin/scripts/sync-site.sh`, add a `CHANGELOG.md` bullet, then
+`bash tests/gates/run-all.sh` (and `claude plugin validate .`). Skipping `sync-site.sh` leaves the
+Pages `site/` stale and fails gate `18-pages-in-sync`. See [`CONTRIBUTING.md`](../CONTRIBUTING.md).

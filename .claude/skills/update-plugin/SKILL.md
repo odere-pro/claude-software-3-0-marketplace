@@ -8,7 +8,7 @@ description: >-
 disable-model-invocation: true
 model: sonnet
 argument-hint: "<name> [--repo <owner/repo>] [--name <new-name>] [--description \"…\"] [--keywords a,b,c]"
-allowed-tools: Read, Grep, Glob, Agent, Edit(.claude-plugin/marketplace.json), Edit(README.md), Edit(CHANGELOG.md), Bash(bash .claude/skills/add-plugin/scripts/vet-candidate.sh:*), Bash(bash .claude/skills/add-plugin/scripts/update-entry.sh:*), Bash(bash .claude/skills/add-plugin/scripts/sync-readme.sh:*), Bash(bash tests/gates/run-all.sh), Bash(claude plugin validate:*), Bash(git checkout:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(gh pr create:*)
+allowed-tools: Read, Grep, Glob, Agent, Edit(.claude-plugin/marketplace.json), Edit(README.md), Edit(CHANGELOG.md), Bash(bash .claude/skills/add-plugin/scripts/vet-candidate.sh:*), Bash(bash .claude/skills/add-plugin/scripts/update-entry.sh:*), Bash(bash .claude/skills/add-plugin/scripts/sync-readme.sh:*), Bash(bash .claude/skills/add-plugin/scripts/sync-site.sh:*), Bash(bash tests/gates/run-all.sh), Bash(claude plugin validate:*), Bash(git checkout:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(gh pr create:*)
 ---
 
 # /update-plugin
@@ -31,29 +31,31 @@ plugin's `plugin.json`), **replace/repoint** (`--repo <owner/repo>`), and **rena
 3. **Apply.** Run
    `bash .claude/skills/add-plugin/scripts/update-entry.sh <name> [--repo …] [--name …] [--description "…"] [--keywords a,b]`
    with the curated values. It re-vets and replaces the entry in place.
-4. **Sync docs.** Run `bash .claude/skills/add-plugin/scripts/sync-readme.sh` and add a `CHANGELOG.md`
-   bullet under `## [Unreleased]` (e.g. `- Update \`<name>\` …`).
+4. **Sync docs.** Run `bash .claude/skills/add-plugin/scripts/sync-readme.sh` **and**
+   `bash .claude/skills/add-plugin/scripts/sync-site.sh` (gate `18-pages-in-sync` fails if the Pages
+   `site/` drifts from the manifest), then add a `CHANGELOG.md` bullet under `## [Unreleased]`
+   (e.g. `- Update \`<name>\` …`).
 5. **Verify.** Run `bash tests/gates/run-all.sh` and `claude plugin validate .` — both green.
-6. **PR.** Branch `feat/update-<name>`, `git add` the manifest + README + CHANGELOG, commit
+6. **PR.** Branch `feat/update-<name>`, `git add` the manifest + README + CHANGELOG + `site/`, commit
    `feat: update <name> in the odere-pro marketplace` (human-authored), push `-u`, `gh pr create`.
    Report the PR URL.
 
 ## Boundaries
 
 - The entry must already exist (this never adds). odere-pro repos only; never edits the plugin's repo.
-- Touches only `.claude-plugin/marketplace.json`, `README.md`, `CHANGELOG.md`; never sets
-  `version`/`sha`/`commit`.
+- Touches only `.claude-plugin/marketplace.json`, `README.md`, `CHANGELOG.md`, and the generated
+  `site/`; never sets `version`/`sha`/`commit`.
 
 ## Failure handling
 
 If any step fails (the target is blocked on re-vet, a gate goes red, `claude plugin validate` errors,
 or the PR push fails), **stop and roll back** so the working tree is left exactly as it started —
-never half applied. Undo both the staged and the working-tree state of the three files this skill
+never half applied. Undo both the staged and the working-tree state of the paths this skill
 touches:
 
 ```bash
-git restore --staged .claude-plugin/marketplace.json README.md CHANGELOG.md
-git restore .claude-plugin/marketplace.json README.md CHANGELOG.md
+git restore --staged .claude-plugin/marketplace.json README.md CHANGELOG.md site/
+git restore .claude-plugin/marketplace.json README.md CHANGELOG.md site/
 ```
 
 `git restore --staged …` first unstages anything `git add`ed in step 6; the second `git restore …`

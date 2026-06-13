@@ -8,7 +8,7 @@ description: >-
 disable-model-invocation: true
 model: sonnet
 argument-hint: "<repo|owner/repo> [--name <name>] [--description \"…\"] [--keywords a,b,c]"
-allowed-tools: Read, Grep, Glob, Agent, Edit(.claude-plugin/marketplace.json), Edit(README.md), Edit(CHANGELOG.md), Bash(bash .claude/skills/add-plugin/scripts/vet-candidate.sh:*), Bash(bash .claude/skills/add-plugin/scripts/add-entry.sh:*), Bash(bash .claude/skills/add-plugin/scripts/sync-readme.sh:*), Bash(bash tests/gates/run-all.sh), Bash(claude plugin validate:*), Bash(git checkout:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(gh pr create:*)
+allowed-tools: Read, Grep, Glob, Agent, Edit(.claude-plugin/marketplace.json), Edit(README.md), Edit(CHANGELOG.md), Bash(bash .claude/skills/add-plugin/scripts/vet-candidate.sh:*), Bash(bash .claude/skills/add-plugin/scripts/add-entry.sh:*), Bash(bash .claude/skills/add-plugin/scripts/sync-readme.sh:*), Bash(bash .claude/skills/add-plugin/scripts/sync-site.sh:*), Bash(bash tests/gates/run-all.sh), Bash(claude plugin validate:*), Bash(git checkout:*), Bash(git add:*), Bash(git commit:*), Bash(git push:*), Bash(gh pr create:*)
 ---
 
 # /add-plugin
@@ -37,28 +37,30 @@ plus optional `--name <name>` to override the entry name.
    passing the curated description/keywords. The script re-vets, refuses duplicates, and writes the
    entry with `jq --indent 2`.
 4. **Sync docs.** Run `bash ${CLAUDE_SKILL_DIR}/scripts/sync-readme.sh` to regenerate the README
-   Plugins table, and add a `CHANGELOG.md` bullet under `## [Unreleased]` (e.g. `- List \`<name>\`.`).
+   Plugins table **and** `bash ${CLAUDE_SKILL_DIR}/scripts/sync-site.sh` to regenerate the Pages
+   `site/` (gate `18-pages-in-sync` fails if `site/` drifts from the manifest), then add a
+   `CHANGELOG.md` bullet under `## [Unreleased]` (e.g. `- List \`<name>\`.`).
 5. **Verify.** Run `bash tests/gates/run-all.sh` and `claude plugin validate . --strict`. Both must be
    green before continuing.
-6. **PR.** Create a branch `feat/add-<name>`, `git add` the manifest + README + CHANGELOG, commit
+6. **PR.** Create a branch `feat/add-<name>`, `git add` the manifest + README + CHANGELOG + `site/`, commit
    `feat: list <name> in the odere-pro marketplace` (human-authored — no AI attribution), push `-u`,
    and `gh pr create` with a short body. Report the PR URL.
 
 ## Boundaries
 
 - odere-pro repos only; never edits a candidate's own repository (block-with-instructions).
-- Touches only `.claude-plugin/marketplace.json`, `README.md`, `CHANGELOG.md`.
+- Touches only `.claude-plugin/marketplace.json`, `README.md`, `CHANGELOG.md`, and the generated `site/`.
 - Never sets `version`/`sha`/`commit` on an entry; the scripts and the `marketplace-guard` hook enforce it.
 
 ## Failure handling
 
 If any step fails (a blocker surfaces, a gate goes red, `claude plugin validate` errors, or the PR
 push fails), **stop and roll back** so the working tree is left exactly as it started — never half
-applied. Undo both the staged and the working-tree state of the three files this skill touches:
+applied. Undo both the staged and the working-tree state of the paths this skill touches:
 
 ```bash
-git restore --staged .claude-plugin/marketplace.json README.md CHANGELOG.md
-git restore .claude-plugin/marketplace.json README.md CHANGELOG.md
+git restore --staged .claude-plugin/marketplace.json README.md CHANGELOG.md site/
+git restore .claude-plugin/marketplace.json README.md CHANGELOG.md site/
 ```
 
 `git restore --staged …` first unstages anything `git add`ed in step 6; the second `git restore …`
