@@ -72,6 +72,9 @@ claude plugin update <plugin>      # pull the latest from the plugin repo's defa
 claude plugin uninstall <plugin>   # remove it
 ```
 
+Per-plugin install + quick-start guides live in [`docs/plugins/`](docs/plugins/) — e.g.
+[claude-oop-excellence](docs/plugins/claude-oop-excellence.md).
+
 ## Plugins
 
 <!-- The table below is generated from .claude-plugin/marketplace.json by
@@ -79,7 +82,7 @@ claude plugin uninstall <plugin>   # remove it
 <!-- BEGIN PLUGINS -->
 | Plugin | Repo | What it does | License | Keywords |
 | --- | --- | --- | --- | --- |
-| `claude-oop-excellence` | [odere-pro/claude-oop-excellence](https://github.com/odere-pro/claude-oop-excellence) | Audits and refactors codebases for object-oriented design quality: parallel RISK + PATTERN analysis tracks, a 102-entity glossary (45 issues, 57 patterns), and gated fix/implement commands — language-agnostic. | MIT | `oop`, `object-oriented-design`, `solid`, `design-patterns`, `code-quality`, `refactoring`, `audit`, `language-agnostic` |
+| `claude-oop-excellence` | [odere-pro/claude-oop-excellence](https://github.com/odere-pro/claude-oop-excellence) | Audits and refactors codebases for object-oriented design quality: parallel RISK + PATTERN analysis tracks, a 102-entity glossary (45 issues, 57 patterns), and gated fix/implement commands — language-agnostic. | MIT | `oop`, `object-oriented-design`, `solid`, `encapsulation`, `design-patterns`, `antipatterns`, `code-quality`, `refactoring`, `audit`, `risk-scan`, `language-agnostic` |
 | `claude-wiki-pages` | [odere-pro/claude-wiki-pages-plugin](https://github.com/odere-pro/claude-wiki-pages-plugin) | Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy's LLM Wiki pattern: a four-layer stack of 23 skills, 7 agents, and 15 schema-enforcing hooks ingests sources into typed, citation-verified pages — with offline Ollama support and git-checkpointed self-healing. | Apache-2.0 | `obsidian`, `knowledge-base`, `knowledge-management`, `llm-wiki`, `rag`, `multi-agent`, `agentic`, `markdown`, `provenance`, `local-models`, `ollama`, `karpathy` |
 | `claude-calibration` | [odere-pro/claude-calibration](https://github.com/odere-pro/claude-calibration) | Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups (CLAUDE.md, rules, skills, hooks, MCP, plugins) with scoring rubrics and enforcement scaffolding for recurring findings. | MIT | `calibration`, `evaluation`, `config-audit`, `harness`, `orchestration`, `claude-code-setup` |
 <!-- END PLUGINS -->

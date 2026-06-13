@@ -20,10 +20,13 @@
         "oop",
         "object-oriented-design",
         "solid",
+        "encapsulation",
         "design-patterns",
+        "antipatterns",
         "code-quality",
         "refactoring",
         "audit",
+        "risk-scan",
         "language-agnostic"
       ]
     },
