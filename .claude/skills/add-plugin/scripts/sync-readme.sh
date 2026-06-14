@@ -33,17 +33,23 @@ blockfile="$(mktemp)"
   if [ "$(jq '.plugins | length' "$manifest")" -eq 0 ]; then
     printf '_No plugins listed yet — add one with `/add-plugin <repo>` (see [docs/adding-plugins.md](docs/adding-plugins.md))._\n'
   else
-    printf '| Plugin | Repo | What it does | License | Keywords |\n'
-    printf '| --- | --- | --- | --- | --- |\n'
-    # License and Keywords columns are rendered straight from the manifest (roadmap P13h): License is
-    # the entry `.license`; Keywords joins `.keywords` with ", ". Both stay in sync with the manifest
-    # because this generator is the single source for the table (G9 checks byte-equality).
-    # Field normalization (.license fallback, .keywords null-coalesce, homepage) is shared via
-    # mk_each_plugin_ndjson in lib.sh (W2.3 DRY extraction).
+    printf '| Plugin | Description | How to add |\n'
+    printf '| --- | --- | --- |\n'
+    # Three columns, all derived from the manifest (G9 checks byte-equality, so this generator is the
+    # single source for the table). Plugin: the entry `.name`, backticked and linked to its repo.
+    # Description: the first clause of `.description` via `short` (cut at the earliest of ". ", ": ",
+    # " — ", or " (", trailing punctuation trimmed, one period appended) — the full description stays
+    # canonical in the manifest. How to add: the per-entry `claude plugin install <name>@odere-pro`.
+    # Field normalization (homepage, .license, .keywords) is shared via mk_each_plugin_ndjson in lib.sh.
     mk_each_plugin_ndjson "$manifest" | jq -r '
-      "| `\(.name)` | [\(.repo)](https://github.com/\(.repo)) | "
-        + "\(.description) | \(.license) | "
-        + "\(.keywords | map("`" + . + "`") | join(", ") | if . == "" then "—" else . end) |"
+      def short:
+        . as $d
+        | ([". ", ": ", " — ", " ("] | map(. as $delim | $d | index($delim)) | map(select(. != null)) | min) as $i
+        | (if $i == null then $d else $d[0:$i] end)
+        | sub("[[:space:]:—.-]+$"; "")
+        | . + ".";
+      "| [`\(.name)`](https://github.com/\(.repo)) | \(.description | short) | "
+        + "`claude plugin install \(.name)@odere-pro` |"
     '
   fi
   printf '%s\n' "$end"

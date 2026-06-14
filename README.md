@@ -39,11 +39,11 @@ per-project** — once installed, a plugin is available in every repo you open.
 <!-- The table below is generated from .claude-plugin/marketplace.json by
      .claude/skills/add-plugin/scripts/sync-readme.sh. Don't edit it by hand. -->
 <!-- BEGIN PLUGINS -->
-| Plugin | Repo | What it does | License | Keywords |
-| --- | --- | --- | --- | --- |
-| `claude-oop-excellence` | [odere-pro/claude-oop-excellence](https://github.com/odere-pro/claude-oop-excellence) | Audits and refactors codebases for object-oriented design quality: parallel RISK + PATTERN analysis tracks, a 102-entity glossary (45 issues, 57 patterns), and gated fix/implement commands — language-agnostic. | MIT | `oop`, `object-oriented-design`, `solid`, `encapsulation`, `design-patterns`, `antipatterns`, `code-quality`, `refactoring`, `audit`, `risk-scan`, `language-agnostic` |
-| `claude-wiki-pages` | [odere-pro/claude-wiki-pages-plugin](https://github.com/odere-pro/claude-wiki-pages-plugin) | Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy's LLM Wiki pattern: a four-layer stack of 23 skills, 7 agents, and 15 schema-enforcing hooks ingests sources into typed, citation-verified pages — with offline Ollama support and git-checkpointed self-healing. | Apache-2.0 | `obsidian`, `knowledge-base`, `knowledge-management`, `llm-wiki`, `rag`, `multi-agent`, `agentic`, `markdown`, `provenance`, `local-models`, `ollama`, `karpathy` |
-| `claude-calibration` | [odere-pro/claude-calibration](https://github.com/odere-pro/claude-calibration) | Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups (CLAUDE.md, rules, skills, hooks, MCP, plugins) with scoring rubrics and enforcement scaffolding for recurring findings. | MIT | `calibration`, `evaluation`, `config-audit`, `harness`, `orchestration`, `claude-code-setup` |
+| Plugin | Description | How to add |
+| --- | --- | --- |
+| [`claude-oop-excellence`](https://github.com/odere-pro/claude-oop-excellence) | Audits and refactors codebases for object-oriented design quality. | `claude plugin install claude-oop-excellence@odere-pro` |
+| [`claude-wiki-pages`](https://github.com/odere-pro/claude-wiki-pages-plugin) | Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy's LLM Wiki pattern. | `claude plugin install claude-wiki-pages@odere-pro` |
+| [`claude-calibration`](https://github.com/odere-pro/claude-calibration) | Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups. | `claude plugin install claude-calibration@odere-pro` |
 <!-- END PLUGINS -->
 
 **Start using →** each plugin ships an install + quick-start guide, so you can go from "added the
@@ -85,15 +85,6 @@ on every push. The common ones and their fixes:
   one line, so `marketplace add` swallowed the next as part of the repo argument. Run each command on
   its own line, marketplace first.
 
-- **`Failed to load marketplace "odere-pro": cache-miss`** — the local catalog cache is stale. Rebuild
-  it from the shell:
-
-  ```bash
-  claude plugin marketplace remove odere-pro
-  claude plugin marketplace add odere-pro/claude-software-3-0-marketplace
-  claude plugin install <plugin>@odere-pro
-  ```
-
 - **`already installed`, or the plugin loads from a local path** — a prior local/dev install (e.g.
   `--plugin-dir`, or the plugin's repo added as its own marketplace) shadows the marketplace copy.
   Uninstall, then reinstall so it resolves into the per-user cache:
@@ -105,14 +96,6 @@ on every push. The common ones and their fixes:
 
 - **Install everything through the one `odere-pro` marketplace** (`<plugin>@odere-pro`). Don't also
   register an individual plugin's repo as a separate marketplace — same-name entries collide.
-
-## Why trust this registry
-
-Every listing passes a **20-gate automated suite** (`bash tests/gates/run-all.sh`) on every push and
-PR: the manifest is structurally linted (G2) and secret-scanned (G4); supply-chain hygiene is enforced
-— SHA-pinned actions (G15) and least-privilege workflow permissions (G16); and each plugin's
-`plugin.json` is vetted for a valid SPDX license (G2) and at least one domain-specific keyword. CI also
-runs [CodeQL](https://codeql.github.com/) and [OpenSSF Scorecard](https://securityscorecards.dev/).
 
 ## For maintainers
 
