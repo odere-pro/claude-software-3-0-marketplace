@@ -16,3 +16,6 @@ plugin-specific quick start on top.
   `/onboarding` → `/audit` → `/fix-risks` | `/implement-patterns`.
 - [`claude-calibration.md`](claude-calibration.md) — evaluate → plan → calibrate loop over your Claude
   Code setup; `/calibration` → `/calibration-audit` → `/calibrate "<goal>"`.
+- [`claude-wiki-pages.md`](claude-wiki-pages.md) — Obsidian vault → provenance-tracked LLM
+  knowledge base on Karpathy's LLM Wiki pattern; `/claude-wiki-pages:onboarding` →
+  `/claude-wiki-pages:wiki` → `/claude-wiki-pages:doctor`.

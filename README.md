@@ -37,7 +37,8 @@ Browse the full listing with live search at
 
 ## Install plugins
 
-Once the marketplace is added, install any plugin individually:
+Add the marketplace first (above), then install any plugin individually. Submit each as its **own**
+command — one slash command per line, and let the `marketplace add` finish before you install:
 
 ```text
 /plugin install <plugin>@odere-pro
@@ -72,8 +73,44 @@ claude plugin update <plugin>      # pull the latest from the plugin repo's defa
 claude plugin uninstall <plugin>   # remove it
 ```
 
-Per-plugin install + quick-start guides live in [`docs/plugins/`](docs/plugins/) — e.g.
-[claude-oop-excellence](docs/plugins/claude-oop-excellence.md).
+Per-plugin install + quick-start guides live in [`docs/plugins/`](docs/plugins/) — one per
+listed plugin: [claude-oop-excellence](docs/plugins/claude-oop-excellence.md),
+[claude-wiki-pages](docs/plugins/claude-wiki-pages.md), and
+[claude-calibration](docs/plugins/claude-calibration.md).
+
+## Troubleshooting installs
+
+Most install snags are **local Claude Code state**, not the registry — the manifest is gate-verified
+on every push. The common ones and their fixes:
+
+- **`URL rejected: Malformed input…` when adding the marketplace** — two commands were submitted on
+  one line, so `marketplace add` swallowed the next command as part of the repo argument. Run each
+  command on its own line, marketplace first.
+
+- **`Failed to load marketplace "odere-pro": cache-miss`** — the local marketplace catalog cache is
+  stale. Rebuild it from the shell:
+
+  ```bash
+  claude plugin marketplace remove odere-pro
+  claude plugin marketplace add odere-pro/claude-software-3-0-marketplace
+  claude plugin install <plugin>@odere-pro
+  ```
+
+- **`already installed`, or the plugin loads from a local path instead of the marketplace** — a prior
+  local/dev install (e.g. `--plugin-dir`, or the plugin's repo added as its own marketplace) shadows
+  the marketplace copy. Uninstall, then reinstall so it resolves into the per-user cache:
+
+  ```bash
+  claude plugin uninstall <plugin>@odere-pro
+  claude plugin install <plugin>@odere-pro
+  ```
+
+- **Install everything through the one `odere-pro` marketplace** (`<plugin>@odere-pro`). Don't also
+  register an individual plugin's own repo as a separate marketplace — same-name entries from two
+  marketplaces collide.
+
+After any install, a session restart may be needed before the plugin's commands, agents, and skills
+load; `claude plugin list` shows what's installed and enabled.
 
 ## Plugins
 
