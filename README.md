@@ -85,15 +85,6 @@ on every push. The common ones and their fixes:
   one line, so `marketplace add` swallowed the next as part of the repo argument. Run each command on
   its own line, marketplace first.
 
-- **`Failed to load marketplace "odere-pro": cache-miss`** — the local catalog cache is stale. Rebuild
-  it from the shell:
-
-  ```bash
-  claude plugin marketplace remove odere-pro
-  claude plugin marketplace add odere-pro/claude-software-3-0-marketplace
-  claude plugin install <plugin>@odere-pro
-  ```
-
 - **`already installed`, or the plugin loads from a local path** — a prior local/dev install (e.g.
   `--plugin-dir`, or the plugin's repo added as its own marketplace) shadows the marketplace copy.
   Uninstall, then reinstall so it resolves into the per-user cache:
@@ -105,14 +96,6 @@ on every push. The common ones and their fixes:
 
 - **Install everything through the one `odere-pro` marketplace** (`<plugin>@odere-pro`). Don't also
   register an individual plugin's repo as a separate marketplace — same-name entries collide.
-
-## Why trust this registry
-
-Every listing passes a **20-gate automated suite** (`bash tests/gates/run-all.sh`) on every push and
-PR: the manifest is structurally linted (G2) and secret-scanned (G4); supply-chain hygiene is enforced
-— SHA-pinned actions (G15) and least-privilege workflow permissions (G16); and each plugin's
-`plugin.json` is vetted for a valid SPDX license (G2) and at least one domain-specific keyword. CI also
-runs [CodeQL](https://codeql.github.com/) and [OpenSSF Scorecard](https://securityscorecards.dev/).
 
 ## For maintainers
 
