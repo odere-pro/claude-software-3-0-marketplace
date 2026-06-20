@@ -25,9 +25,11 @@ claude plugin install claude-oop-excellence@odere-pro
 claude plugin list                          # confirm installed/enabled
 ```
 
-Plugins install per-user (per machine), not per-project — once installed it's available in every repo
-you open. A session restart may be needed for its commands, agents, and skills to load. See the root
-[README](../../README.md) for the generic install / `claude plugin …` lifecycle details.
+Plugins install per-user (per machine) by default — available in every repo you open — or you can
+scope this marketplace and plugin to a single project by committing them to that repo's
+`.claude/settings.json`. A session restart may be needed for its commands, agents, and skills to load.
+See the root [README](../../README.md#install) for both install scopes and the `claude plugin …`
+lifecycle details.
 
 **Prerequisites: none.** The plugin ships **no hooks and no MCP server**, makes **no toolchain
 assumptions**, and runs your project's *own* detected test/lint commands (`npm test`, `pytest`,

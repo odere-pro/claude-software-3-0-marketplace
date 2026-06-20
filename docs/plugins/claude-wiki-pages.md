@@ -25,9 +25,11 @@ claude plugin install claude-wiki-pages@odere-pro
 claude plugin list                          # confirm installed/enabled
 ```
 
-Plugins install per-user (per machine), not per-project — once installed it's available in every repo
-you open. A session restart may be needed for its skills, agents, and hooks to load. See the root
-[README](../../README.md) for the generic install / `claude plugin …` lifecycle details.
+Plugins install per-user (per machine) by default — available in every repo you open — or you can
+scope this marketplace and plugin to a single project by committing them to that repo's
+`.claude/settings.json`. A session restart may be needed for its skills, agents, and hooks to load.
+See the root [README](../../README.md#install) for both install scopes and the `claude plugin …`
+lifecycle details.
 
 **Prerequisites:** `bash`, `git`, and `jq`. **Bun >= 1.2 is recommended** — it runs the deterministic
 engine and the git-checkpointed self-heal; without it the plugin still works, but those engine

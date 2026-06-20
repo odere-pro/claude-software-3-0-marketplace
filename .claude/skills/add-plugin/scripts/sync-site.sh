@@ -31,7 +31,7 @@ site_dir="$root/site"
 # ── Constants ─────────────────────────────────────────────────────────────────
 # Pinned build date — operator bumps this when re-publishing. Never use `date`
 # (that would break byte-equality in --check mode).
-SITE_BUILD_DATE="2026-06-06"
+SITE_BUILD_DATE="2026-06-20"
 CANONICAL_URL="https://odere-pro.github.io/claude-software-3-0-marketplace/"
 GITHUB_REPO_URL="https://github.com/odere-pro/claude-software-3-0-marketplace"
 
@@ -191,7 +191,7 @@ else
       (if $hp_esc != "" then "<a href=\"" + $hp_esc + "\">" + $name_esc + "</a>" else $name_esc end) +
     "</h3>\n" +
     "          <p class=\"card-desc\">" + $desc_esc + "</p>\n" +
-    "          <pre class=\"install-cmd\"><code>/plugin install " + $name_esc + "@odere-pro</code></pre>\n" +
+    "          <pre class=\"install-cmd\"><code>claude plugin install " + $name_esc + "@odere-pro --scope project\nclaude plugin update " + $name_esc + "@odere-pro --scope project</code></pre>\n" +
     "          <div class=\"card-meta\">\n" +
     "            <span class=\"license\">" + $lic_esc + "</span>\n" +
     (if .keywords | length > 0 then
@@ -669,6 +669,62 @@ cat >"$tmpdir/index.html" <<HTMLEOF
         margin-bottom: 2rem;
       }
 
+      .h3 {
+        font-family: var(--font-mono);
+        font-size: 1.05rem;
+        letter-spacing: -0.01em;
+        color: var(--color-text);
+        margin: 2.2rem 0 0.4rem;
+      }
+
+      .req-list {
+        margin: 0;
+        padding-left: 1.2rem;
+        color: var(--color-muted);
+        font-size: 1.02rem;
+      }
+
+      .req-list li {
+        margin-bottom: 0.6rem;
+      }
+
+      .req-list strong {
+        color: var(--color-text);
+      }
+
+      .faq details {
+        background: var(--color-bg-raised);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-sm);
+        padding: 0 1.2rem;
+        margin-bottom: 0.6rem;
+      }
+
+      .faq summary {
+        cursor: pointer;
+        padding: 0.95rem 0;
+        font-weight: 600;
+        color: var(--color-text);
+      }
+
+      .faq summary:hover {
+        color: var(--color-accent);
+      }
+
+      .faq details[open] summary {
+        color: var(--color-accent);
+        border-bottom: 1px solid var(--color-line);
+      }
+
+      .faq details > p {
+        color: var(--color-muted);
+        font-size: 0.96rem;
+      }
+
+      .faq details > pre {
+        margin-bottom: 1rem;
+      }
+
       pre {
         margin: 0;
         padding: 1.4rem 1.5rem;
@@ -732,8 +788,10 @@ ${filter_css}
       <nav class="wrap" aria-label="Primary">
         <a class="brand" href="#main">odere<span>-pro</span></a>
         <span class="spacer"></span>
+        <a href="#requirements">Requirements</a>
+        <a href="#install">Install</a>
         <a href="#plugins">Plugins</a>
-        <a href="#add-marketplace">Add the marketplace</a>
+        <a href="#faq">FAQ</a>
         <a href="${GITHUB_REPO_URL}">GitHub</a>
       </nav>
     </header>
@@ -752,19 +810,69 @@ ${filter_css}
 
       <section
         class="band wrap"
-        id="add-marketplace"
-        aria-labelledby="add-heading"
+        id="requirements"
+        aria-labelledby="requirements-heading"
+      >
+        <p class="kicker">Before you start</p>
+        <h2 class="h2" id="requirements-heading">Requirements</h2>
+        <p class="section-lead">
+          A short checklist — the <a href="#faq">FAQ</a> has one-line install pointers for each.
+        </p>
+        <ul class="req-list">
+          <li><strong>Claude Code with a working <code>/plugin</code> command.</strong> It's generally available — if you don't see it, <a href="https://docs.claude.com/en/docs/claude-code/setup">update Claude Code</a>.</li>
+          <li><strong><code>git</code></strong> and <strong><code>bash</code></strong> on your <code>PATH</code>.</li>
+          <li>A few plugins also need <strong>Node.js / Bun</strong> or <strong><code>jq</code></strong> — each plugin lists its own prerequisites.</li>
+        </ul>
+      </section>
+
+      <section
+        class="band wrap"
+        id="install"
+        aria-labelledby="install-heading"
       >
         <p class="kicker">Get started</p>
-        <h2 class="h2" id="add-heading">Add the marketplace</h2>
+        <h2 class="h2" id="install-heading">Install</h2>
         <p class="section-lead">
-          One command to register all plugins under the <code>@odere-pro</code> scope:
+          Add the marketplace once, then install any plugin under the <code>@odere-pro</code> scope.
+          Every step works from the in-session <code>/plugin</code> command or the
+          <code>claude plugin</code> shell CLI.
+        </p>
+
+        <h3 class="h3">Global &mdash; per-user (the default)</h3>
+        <p class="section-lead">
+          Available in every repo you open. In a Claude Code session (one command per line):
         </p>
         <div class="add-marketplace">
-          <pre><code>/plugin marketplace add odere-pro/claude-software-3-0-marketplace</code></pre>
+          <pre><code>/plugin marketplace add odere-pro/claude-software-3-0-marketplace
+/plugin install &lt;plugin&gt;@odere-pro</code></pre>
         </div>
-        <p class="section-lead">Then install any plugin individually:</p>
-        <pre><code>/plugin install &lt;name&gt;@odere-pro</code></pre>
+        <p class="section-lead">Or from the shell:</p>
+        <pre><code>claude plugin marketplace add odere-pro/claude-software-3-0-marketplace
+claude plugin install &lt;plugin&gt;@odere-pro</code></pre>
+
+        <h3 class="h3">Project-local &mdash; scoped to one repo, shared with your team</h3>
+        <p class="section-lead">
+          Commit the marketplace and the plugins you want into a project's
+          <code>.claude/settings.json</code>. Anyone who clones the repo gets the same tools:
+        </p>
+        <pre><code>{
+  "extraKnownMarketplaces": {
+    "odere-pro": {
+      "source": { "source": "github", "repo": "odere-pro/claude-software-3-0-marketplace" }
+    }
+  },
+  "enabledPlugins": {
+    "&lt;plugin&gt;@odere-pro": true
+  }
+}</code></pre>
+        <p class="section-lead">Or register the marketplace at project scope from the shell:</p>
+        <pre><code>claude plugin marketplace add odere-pro/claude-software-3-0-marketplace --scope project</code></pre>
+
+        <h3 class="h3">Manage what you've installed</h3>
+        <pre><code>claude plugin update &lt;plugin&gt;@odere-pro     # pull the latest from the plugin's default branch
+claude plugin uninstall &lt;plugin&gt;@odere-pro  # remove it
+claude plugin list                          # what's installed / enabled
+claude plugin details &lt;plugin&gt;@odere-pro    # component inventory + projected token cost</code></pre>
       </section>
 
       <section
@@ -780,6 +888,58 @@ ${filter_css}
 ${filter_toolbar}
         <div class="grid">
 ${plugin_cards}
+        </div>
+      </section>
+
+      <section class="band wrap" id="faq" aria-labelledby="faq-heading">
+        <p class="kicker">Help</p>
+        <h2 class="h2" id="faq-heading">FAQ</h2>
+        <div class="faq">
+          <details>
+            <summary>I don't have Claude Code / the <code>/plugin</code> command</summary>
+            <p>Install or update Claude Code from the
+            <a href="https://docs.claude.com/en/docs/claude-code/setup">official setup guide</a>;
+            <code>/plugin</code> ships in current versions.</p>
+          </details>
+          <details>
+            <summary>How do I install Git?</summary>
+            <p>Get it from <a href="https://git-scm.com/downloads">git-scm.com/downloads</a>. On
+            macOS, <code>xcode-select --install</code> also provides it; most Linux distros ship it
+            via their package manager.</p>
+          </details>
+          <details>
+            <summary>How do I install Node.js?</summary>
+            <p>Download the LTS build from
+            <a href="https://nodejs.org/en/download">nodejs.org</a>; that includes <code>npm</code>.</p>
+          </details>
+          <details>
+            <summary>How do I manage Node versions (NVM)?</summary>
+            <p>Use <a href="https://github.com/nvm-sh/nvm#installing-and-updating">nvm</a>
+            (macOS/Linux) &mdash; <code>nvm install --lts</code>, then <code>nvm use --lts</code>. On
+            Windows, use <a href="https://github.com/coreybutler/nvm-windows">nvm-windows</a>.</p>
+          </details>
+          <details>
+            <summary><code>URL rejected: Malformed input…</code> when adding the marketplace</summary>
+            <p>Two commands were submitted on one line, so <code>marketplace add</code> swallowed the
+            next as part of the repo argument. Run each command on its own line,
+            <code>marketplace add</code> first.</p>
+          </details>
+          <details>
+            <summary><code>already installed</code>, or the plugin loads from a local path</summary>
+            <p>A prior local/dev install (e.g. <code>--plugin-dir</code>, or the plugin's repo added
+            as its own marketplace) shadows the marketplace copy. Uninstall, then reinstall:</p>
+            <pre><code>claude plugin uninstall &lt;plugin&gt;@odere-pro
+claude plugin install &lt;plugin&gt;@odere-pro</code></pre>
+            <p>Install everything through the one <code>odere-pro</code> marketplace &mdash; don't
+            also register an individual plugin's repo as a separate marketplace, or same-name entries
+            collide.</p>
+          </details>
+          <details>
+            <summary>I want to contribute or add a plugin</summary>
+            <p>See
+            <a href="${GITHUB_REPO_URL}/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> and
+            <a href="${GITHUB_REPO_URL}/blob/main/docs/adding-plugins.md">docs/adding-plugins.md</a>.</p>
+          </details>
         </div>
       </section>
     </main>
