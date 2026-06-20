@@ -191,7 +191,7 @@ else
       (if $hp_esc != "" then "<a href=\"" + $hp_esc + "\">" + $name_esc + "</a>" else $name_esc end) +
     "</h3>\n" +
     "          <p class=\"card-desc\">" + $desc_esc + "</p>\n" +
-    "          <pre class=\"install-cmd\"><code>/plugin install " + $name_esc + "@odere-pro</code></pre>\n" +
+    "          <pre class=\"install-cmd\"><code>claude plugin install " + $name_esc + "@odere-pro --scope project\nclaude plugin update " + $name_esc + "@odere-pro --scope project</code></pre>\n" +
     "          <div class=\"card-meta\">\n" +
     "            <span class=\"license\">" + $lic_esc + "</span>\n" +
     (if .keywords | length > 0 then

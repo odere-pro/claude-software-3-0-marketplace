@@ -33,13 +33,14 @@ blockfile="$(mktemp)"
   if [ "$(jq '.plugins | length' "$manifest")" -eq 0 ]; then
     printf '_No plugins listed yet — add one with `/add-plugin <repo>` (see [docs/adding-plugins.md](docs/adding-plugins.md))._\n'
   else
-    printf '| Plugin | Description | How to add |\n'
+    printf '| Plugin | Description | Install / update (current project) |\n'
     printf '| --- | --- | --- |\n'
     # Three columns, all derived from the manifest (G9 checks byte-equality, so this generator is the
     # single source for the table). Plugin: the entry `.name`, backticked and linked to its repo.
     # Description: the first clause of `.description` via `short` (cut at the earliest of ". ", ": ",
     # " — ", or " (", trailing punctuation trimmed, one period appended) — the full description stays
-    # canonical in the manifest. How to add: the per-entry `claude plugin install <name>@odere-pro`.
+    # canonical in the manifest. Install / update: copy-paste `claude plugin` commands scoped to the
+    # current project (`--scope project` writes the marketplace + plugin into ./.claude/settings.json).
     # Field normalization (homepage, .license, .keywords) is shared via mk_each_plugin_ndjson in lib.sh.
     mk_each_plugin_ndjson "$manifest" | jq -r '
       def short:
@@ -49,7 +50,7 @@ blockfile="$(mktemp)"
         | sub("[[:space:]:—.-]+$"; "")
         | . + ".";
       "| [`\(.name)`](https://github.com/\(.repo)) | \(.description | short) | "
-        + "`claude plugin install \(.name)@odere-pro` |"
+        + "`claude plugin install \(.name)@odere-pro --scope project`<br>`claude plugin update \(.name)@odere-pro --scope project` |"
     '
   fi
   printf '%s\n' "$end"

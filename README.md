@@ -68,11 +68,14 @@ clones the repo and trusts the folder gets the same tools — nothing global to 
 }
 ```
 
-Or register the marketplace at project scope from the shell:
+Or do it in one command from the shell — `--scope project` installs the plugin into
+`./.claude/settings.json` and auto-registers the marketplace at project scope:
 
 ```bash
-claude plugin marketplace add odere-pro/claude-software-3-0-marketplace --scope project
+claude plugin install <plugin>@odere-pro --scope project
 ```
+
+That one-command form is what the [catalog below](#plugins) lists per plugin (install + update).
 
 ## Manage installed plugins
 
@@ -96,11 +99,11 @@ claude plugin details <plugin>@odere-pro    # component inventory + projected to
 <!-- The table below is generated from .claude-plugin/marketplace.json by
      .claude/skills/add-plugin/scripts/sync-readme.sh. Don't edit it by hand. -->
 <!-- BEGIN PLUGINS -->
-| Plugin | Description | How to add |
+| Plugin | Description | Install / update (current project) |
 | --- | --- | --- |
-| [`claude-oop-excellence`](https://github.com/odere-pro/claude-oop-excellence) | Audits and refactors codebases for object-oriented design quality. | `claude plugin install claude-oop-excellence@odere-pro` |
-| [`claude-wiki-pages`](https://github.com/odere-pro/claude-wiki-pages-plugin) | Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy's LLM Wiki pattern. | `claude plugin install claude-wiki-pages@odere-pro` |
-| [`claude-calibration`](https://github.com/odere-pro/claude-calibration) | Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups. | `claude plugin install claude-calibration@odere-pro` |
+| [`claude-oop-excellence`](https://github.com/odere-pro/claude-oop-excellence) | Audits and refactors codebases for object-oriented design quality. | `claude plugin install claude-oop-excellence@odere-pro --scope project`<br>`claude plugin update claude-oop-excellence@odere-pro --scope project` |
+| [`claude-wiki-pages`](https://github.com/odere-pro/claude-wiki-pages-plugin) | Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy's LLM Wiki pattern. | `claude plugin install claude-wiki-pages@odere-pro --scope project`<br>`claude plugin update claude-wiki-pages@odere-pro --scope project` |
+| [`claude-calibration`](https://github.com/odere-pro/claude-calibration) | Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups. | `claude plugin install claude-calibration@odere-pro --scope project`<br>`claude plugin update claude-calibration@odere-pro --scope project` |
 <!-- END PLUGINS -->
 
 **Start using →** each plugin ships an install + quick-start guide, so you can go from "added the
