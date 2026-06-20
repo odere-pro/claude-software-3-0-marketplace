@@ -9,7 +9,7 @@ this repo. The plugin's own repo remains the source of truth; if the two drift, 
 the upstream README.
 
 Generic install steps and the `claude plugin …` lifecycle live in the root
-[`README.md`](../../README.md) ("Install plugins" / "Test a plugin"); the pages here add the
+[`README.md`](../../README.md) ("Install" / "Manage installed plugins"); the pages here add the
 plugin-specific quick start on top.
 
 - [`claude-oop-excellence.md`](claude-oop-excellence.md) — OOP-quality audit + gated fix/implement;
