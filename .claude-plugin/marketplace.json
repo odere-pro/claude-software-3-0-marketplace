@@ -71,6 +71,28 @@
         "orchestration",
         "claude-code-setup"
       ]
+    },
+    {
+      "name": "authentic-writing",
+      "source": {
+        "source": "github",
+        "repo": "odere-pro/authentic-writing"
+      },
+      "description": "Router-first writing engine: turns a request into a polished Medium article, LinkedIn post, doc, report, changelog, and more — a calibrated persona panel plus deterministic format validators, in a house voice that reads human.",
+      "homepage": "https://github.com/odere-pro/authentic-writing",
+      "license": "Apache-2.0",
+      "keywords": [
+        "writing",
+        "content",
+        "content-writing",
+        "medium",
+        "linkedin",
+        "blog",
+        "copywriting",
+        "persona-panel",
+        "editor",
+        "authentic-writing"
+      ]
     }
   ]
 }

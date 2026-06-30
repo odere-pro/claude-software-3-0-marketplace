@@ -16,7 +16,7 @@
     <meta name="author" content="odere-pro" />
     <meta
       name="keywords"
-      content="agentic, antipatterns, audit, calibration, claude-code-setup, code-quality, config-audit, design-patterns, encapsulation, evaluation, harness, karpathy, knowledge-base, knowledge-management, language-agnostic, llm-wiki, local-models, markdown, multi-agent, object-oriented-design, obsidian, ollama, oop, orchestration, provenance, rag, refactoring, risk-scan, solid"
+      content="agentic, antipatterns, audit, authentic-writing, blog, calibration, claude-code-setup, code-quality, config-audit, content, content-writing, copywriting, design-patterns, editor, encapsulation, evaluation, harness, karpathy, knowledge-base, knowledge-management, language-agnostic, linkedin, llm-wiki, local-models, markdown, medium, multi-agent, object-oriented-design, obsidian, ollama, oop, orchestration, persona-panel, provenance, rag, refactoring, risk-scan, solid, writing"
     />
     <meta
       name="robots"
@@ -84,7 +84,7 @@
       "description": "Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope.",
       "mainEntity": {
         "@type": "ItemList",
-        "numberOfItems": 3,
+        "numberOfItems": 4,
         "itemListElement": [
           {
             "@type": "ListItem",
@@ -120,6 +120,18 @@
               "url": "https://github.com/odere-pro/claude-calibration",
               "applicationCategory": "DeveloperApplication",
               "license": "https://spdx.org/licenses/MIT.html"
+            }
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "item": {
+              "@type": "SoftwareApplication",
+              "name": "authentic-writing",
+              "description": "Router-first writing engine: turns a request into a polished Medium article, LinkedIn post, doc, report, changelog, and more — a calibrated persona panel plus deterministic format validators, in a house voice that reads human.",
+              "url": "https://github.com/odere-pro/authentic-writing",
+              "applicationCategory": "DeveloperApplication",
+              "license": "https://spdx.org/licenses/Apache-2.0.html"
             }
           }
         ]
@@ -633,7 +645,7 @@
         <h1 id="hero-heading">Claude Code plugins, one marketplace.</h1>
         <p class="lead">Curated Claude Code plugins from odere-pro: each plugin lives in its own repo, is gate-verified before listing, and installs individually via the odere-pro scope.</p>
         <ul class="pills" aria-label="At a glance">
-          <li>3 plugins</li>
+          <li>4 plugins</li>
           <li>agent-operable</li>
           <li>one contract</li>
           <li>gates-not-promises</li>
@@ -722,11 +734,17 @@ claude plugin details &lt;plugin&gt;@odere-pro    # component inventory + projec
         <button class="filter-btn" type="button" data-kw="agentic" aria-pressed="false">agentic</button>
         <button class="filter-btn" type="button" data-kw="antipatterns" aria-pressed="false">antipatterns</button>
         <button class="filter-btn" type="button" data-kw="audit" aria-pressed="false">audit</button>
+        <button class="filter-btn" type="button" data-kw="authentic-writing" aria-pressed="false">authentic-writing</button>
+        <button class="filter-btn" type="button" data-kw="blog" aria-pressed="false">blog</button>
         <button class="filter-btn" type="button" data-kw="calibration" aria-pressed="false">calibration</button>
         <button class="filter-btn" type="button" data-kw="claude-code-setup" aria-pressed="false">claude-code-setup</button>
         <button class="filter-btn" type="button" data-kw="code-quality" aria-pressed="false">code-quality</button>
         <button class="filter-btn" type="button" data-kw="config-audit" aria-pressed="false">config-audit</button>
+        <button class="filter-btn" type="button" data-kw="content" aria-pressed="false">content</button>
+        <button class="filter-btn" type="button" data-kw="content-writing" aria-pressed="false">content-writing</button>
+        <button class="filter-btn" type="button" data-kw="copywriting" aria-pressed="false">copywriting</button>
         <button class="filter-btn" type="button" data-kw="design-patterns" aria-pressed="false">design-patterns</button>
+        <button class="filter-btn" type="button" data-kw="editor" aria-pressed="false">editor</button>
         <button class="filter-btn" type="button" data-kw="encapsulation" aria-pressed="false">encapsulation</button>
         <button class="filter-btn" type="button" data-kw="evaluation" aria-pressed="false">evaluation</button>
         <button class="filter-btn" type="button" data-kw="harness" aria-pressed="false">harness</button>
@@ -734,20 +752,24 @@ claude plugin details &lt;plugin&gt;@odere-pro    # component inventory + projec
         <button class="filter-btn" type="button" data-kw="knowledge-base" aria-pressed="false">knowledge-base</button>
         <button class="filter-btn" type="button" data-kw="knowledge-management" aria-pressed="false">knowledge-management</button>
         <button class="filter-btn" type="button" data-kw="language-agnostic" aria-pressed="false">language-agnostic</button>
+        <button class="filter-btn" type="button" data-kw="linkedin" aria-pressed="false">linkedin</button>
         <button class="filter-btn" type="button" data-kw="llm-wiki" aria-pressed="false">llm-wiki</button>
         <button class="filter-btn" type="button" data-kw="local-models" aria-pressed="false">local-models</button>
         <button class="filter-btn" type="button" data-kw="markdown" aria-pressed="false">markdown</button>
+        <button class="filter-btn" type="button" data-kw="medium" aria-pressed="false">medium</button>
         <button class="filter-btn" type="button" data-kw="multi-agent" aria-pressed="false">multi-agent</button>
         <button class="filter-btn" type="button" data-kw="object-oriented-design" aria-pressed="false">object-oriented-design</button>
         <button class="filter-btn" type="button" data-kw="obsidian" aria-pressed="false">obsidian</button>
         <button class="filter-btn" type="button" data-kw="ollama" aria-pressed="false">ollama</button>
         <button class="filter-btn" type="button" data-kw="oop" aria-pressed="false">oop</button>
         <button class="filter-btn" type="button" data-kw="orchestration" aria-pressed="false">orchestration</button>
+        <button class="filter-btn" type="button" data-kw="persona-panel" aria-pressed="false">persona-panel</button>
         <button class="filter-btn" type="button" data-kw="provenance" aria-pressed="false">provenance</button>
         <button class="filter-btn" type="button" data-kw="rag" aria-pressed="false">rag</button>
         <button class="filter-btn" type="button" data-kw="refactoring" aria-pressed="false">refactoring</button>
         <button class="filter-btn" type="button" data-kw="risk-scan" aria-pressed="false">risk-scan</button>
         <button class="filter-btn" type="button" data-kw="solid" aria-pressed="false">solid</button>
+        <button class="filter-btn" type="button" data-kw="writing" aria-pressed="false">writing</button>
         <button class="filter-btn filter-btn-all" type="button" data-kw="" aria-pressed="true">All</button>
       </div>
         <div class="grid">
@@ -779,6 +801,16 @@ claude plugin update claude-calibration@odere-pro --scope project</code></pre>
           <div class="card-meta">
             <span class="license">MIT</span>
             <span class="keywords"><span class="chip">calibration</span><span class="chip">evaluation</span><span class="chip">config-audit</span><span class="chip">harness</span><span class="chip">orchestration</span><span class="chip">claude-code-setup</span></span>
+          </div>
+        </article>
+        <article class="card" data-keywords="writing content content-writing medium linkedin blog copywriting persona-panel editor authentic-writing">
+          <h3><a href="https://github.com/odere-pro/authentic-writing">authentic-writing</a></h3>
+          <p class="card-desc">Router-first writing engine: turns a request into a polished Medium article, LinkedIn post, doc, report, changelog, and more — a calibrated persona panel plus deterministic format validators, in a house voice that reads human.</p>
+          <pre class="install-cmd"><code>claude plugin install authentic-writing@odere-pro --scope project
+claude plugin update authentic-writing@odere-pro --scope project</code></pre>
+          <div class="card-meta">
+            <span class="license">Apache-2.0</span>
+            <span class="keywords"><span class="chip">writing</span><span class="chip">content</span><span class="chip">content-writing</span><span class="chip">medium</span><span class="chip">linkedin</span><span class="chip">blog</span><span class="chip">copywriting</span><span class="chip">persona-panel</span><span class="chip">editor</span><span class="chip">authentic-writing</span></span>
           </div>
         </article>
         </div>

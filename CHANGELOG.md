@@ -8,6 +8,8 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
 ## [Unreleased]
 
 ### Added
+
+- List `authentic-writing` (`odere-pro/authentic-writing`).
 - List `claude-calibration` (`odere-pro/claude-calibration`).
 - List `claude-wiki-pages` (`odere-pro/claude-wiki-pages-plugin`).
 - List `claude-oop-excellence` (`odere-pro/claude-oop-excellence`).
@@ -30,6 +32,8 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
   (`ci.yml`, dormant `scorecard.yml` / `codeql.yml`, Dependabot, SHA-pinned actions), repo hygiene
   configs, a `tests/gates/` validation suite, a `SOFTWARE-3-0.md`, and nested `CLAUDE.md` navigation.
 - The registry starts **empty** — plugins are added one at a time (after testing) via `/add-plugin`.
+
 ### Changed
+
 - Update `claude-oop-excellence` (`odere-pro/claude-oop-excellence`).
 - Update `claude-wiki-pages` (`odere-pro/claude-wiki-pages-plugin`).
