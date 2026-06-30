@@ -80,7 +80,7 @@
       },
       "description": "Router-first writing engine: turns a request into a polished Medium article, LinkedIn post, doc, report, changelog, and more — a calibrated persona panel plus deterministic format validators, in a house voice that reads human.",
       "homepage": "https://github.com/odere-pro/authentic-writing",
-      "license": "Apache-2.0",
+      "license": "MIT",
       "keywords": [
         "writing",
         "content",
