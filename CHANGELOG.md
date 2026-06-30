@@ -34,6 +34,7 @@ own — each listed plugin carries its own `version` in its `plugin.json` — so
 - The registry starts **empty** — plugins are added one at a time (after testing) via `/add-plugin`.
 
 ### Changed
+- Relicense `authentic-writing` to MIT and add CONVENTIONS.md (the odere-pro plugin standard the suite normalizes to).
 
 - Update `claude-oop-excellence` (`odere-pro/claude-oop-excellence`).
 - Update `claude-wiki-pages` (`odere-pro/claude-wiki-pages-plugin`).
