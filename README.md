@@ -104,6 +104,7 @@ claude plugin details <plugin>@odere-pro    # component inventory + projected to
 | [`claude-oop-excellence`](https://github.com/odere-pro/claude-oop-excellence) | Audits and refactors codebases for object-oriented design quality. | `claude plugin install claude-oop-excellence@odere-pro --scope project`<br>`claude plugin update claude-oop-excellence@odere-pro --scope project` |
 | [`claude-wiki-pages`](https://github.com/odere-pro/claude-wiki-pages-plugin) | Turns an Obsidian vault into a provenance-tracked LLM knowledge base on Karpathy's LLM Wiki pattern. | `claude plugin install claude-wiki-pages@odere-pro --scope project`<br>`claude plugin update claude-wiki-pages@odere-pro --scope project` |
 | [`claude-calibration`](https://github.com/odere-pro/claude-calibration) | Continuous evaluate-plan-calibrate-re-evaluate loop over Claude Code setups. | `claude plugin install claude-calibration@odere-pro --scope project`<br>`claude plugin update claude-calibration@odere-pro --scope project` |
+| [`authentic-writing`](https://github.com/odere-pro/authentic-writing) | Router-first writing engine. | `claude plugin install authentic-writing@odere-pro --scope project`<br>`claude plugin update authentic-writing@odere-pro --scope project` |
 <!-- END PLUGINS -->
 
 **Start using →** each plugin ships an install + quick-start guide, so you can go from "added the
